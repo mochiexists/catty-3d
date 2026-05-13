@@ -26,7 +26,7 @@ public struct Terminal3DRealityScene: View {
     /// single terminal. Always non-nil — centre is required.
     private var centreSource: TerminalLiveTextureSource {
         // swiftlint:disable:next force_unwrapping
-        panes[.centre]!
+        panes[.origin]!
     }
 
     /// Live-tunable orbit parameters. Owned by the parent so the debug
@@ -59,11 +59,15 @@ public struct Terminal3DRealityScene: View {
     /// `applySurfaceMode()` when the value for a slot changes.
     public let surfaceModes: [PaneSlot: TerminalSurfaceMode]
 
+    /// Currently-selected pane. Drives the purple selection glow
+    /// behind that pane's plane. `nil` hides every glow.
+    public let activeSlot: PaneSlot?
+
     /// Legacy single-mode accessor for code paths still expecting
     /// one canonical surface (the cursor-cat positioning uses this
     /// for centre-pane bobbing). Returns the centre's mode.
     private var surfaceMode: TerminalSurfaceMode {
-        surfaceModes[.centre] ?? .flat
+        surfaceModes[.origin] ?? .flat
     }
 
     public init(
@@ -74,7 +78,8 @@ public struct Terminal3DRealityScene: View {
         lookPitch: Float,
         panOffset: SIMD3<Float>,
         cameraMode: CameraMode,
-        surfaceModes: [PaneSlot: TerminalSurfaceMode]
+        surfaceModes: [PaneSlot: TerminalSurfaceMode],
+        activeSlot: PaneSlot? = nil
     ) {
         self.panes = panes
         self.config = config
@@ -84,6 +89,7 @@ public struct Terminal3DRealityScene: View {
         self.panOffset = panOffset
         self.cameraMode = cameraMode
         self.surfaceModes = surfaceModes
+        self.activeSlot = activeSlot
     }
 
     @State private var orbiters = OrbitState()
@@ -125,7 +131,8 @@ public struct Terminal3DRealityScene: View {
             let _ = frameWatchdog.tick(now: context.date)
             RealityView { content in
                 buildScene(into: &content)
-            } update: { _ in
+            } update: { content in
+                ensurePaneEntities(into: &content)
                 orbiters.tick(elapsed: elapsed, config: config)
                 syncPaneVisibility()
                 applyTerminalTexture()
@@ -255,15 +262,130 @@ public struct Terminal3DRealityScene: View {
         camera.camera.fieldOfViewInDegrees = 80
     }
 
+    /// Allocate the per-pane entities (front plane, back plane,
+    /// glow plane, cursor-cat companion) for every coord in `panes`
+    /// that doesn't already have refs. Cheap when the set is stable
+    /// — the loop is skipped after the first pass. Despawned coords
+    /// have their entities yanked from the scene to free up GPU
+    /// resources.
+    @MainActor
+    private func ensurePaneEntities(into content: inout RealityViewCameraContent) {
+        // Add entities for newly-spawned panes.
+        for slot in panes.keys where paneRefs.fronts[slot] == nil {
+            spawnPaneEntities(at: slot, into: &content)
+        }
+        // Remove entities for panes that have since been torn down.
+        for slot in Array(paneRefs.fronts.keys) where panes[slot] == nil {
+            despawnPaneEntities(at: slot)
+        }
+    }
+
+    @MainActor
+    private func spawnPaneEntities(at slot: PaneSlot, into content: inout RealityViewCameraContent) {
+        // Back-grid texture is shared across panes — regenerated each
+        // time we add a new pane, which is cheap enough relative to
+        // how rarely it happens.
+        var sharedBackMaterial = UnlitMaterial(color: .init(white: 0.07, alpha: 1))
+        if let backGrid = makeTerminalBackGridTexture() {
+            sharedBackMaterial = UnlitMaterial()
+            sharedBackMaterial.color = .init(tint: .white, texture: .init(backGrid))
+        }
+
+        let plane = ModelEntity(
+            mesh: .generatePlane(width: 1.6, height: 1.05, cornerRadius: 0),
+            materials: [UnlitMaterial(color: .black)]
+        )
+        plane.position = slot.worldPosition
+        content.add(plane)
+
+        let back = ModelEntity(
+            mesh: .generatePlane(width: 1.6, height: 1.05, cornerRadius: 0),
+            materials: [sharedBackMaterial]
+        )
+        back.orientation = simd_quatf(angle: .pi, axis: [0, 1, 0])
+        back.position = slot.worldPosition + [0, 0, -0.001]
+        content.add(back)
+
+        let frontRef = TerminalPlaneRef()
+        frontRef.entity = plane
+        paneRefs.fronts[slot] = frontRef
+        let backRef = TerminalPlaneRef()
+        backRef.entity = back
+        paneRefs.backs[slot] = backRef
+
+        if let glowTexture = makeSelectionGlowTexture() {
+            var glowMaterial = UnlitMaterial()
+            glowMaterial.color = .init(tint: .white, texture: .init(glowTexture))
+            glowMaterial.blending = .transparent(opacity: .init(floatLiteral: 1.0))
+            glowMaterial.faceCulling = .none
+            let glow = ModelEntity(
+                mesh: .generatePlane(width: 1.72, height: 1.13, cornerRadius: 0),
+                materials: [glowMaterial]
+            )
+            glow.position = slot.worldPosition + [0, 0, -0.002]
+            glow.isEnabled = false
+            content.add(glow)
+            paneRefs.glows[slot] = glow
+        }
+
+        // Cursor-cat companion for this pane.
+        let cursorCat = Entity()
+        cursorCat.name = "cursorCat-\(slot.rawValue)"
+        var cursorCatModel: Entity?
+        if let model = try? Entity.load(named: "maxwell-the-cat", in: .module) {
+            cursorCat.addChild(model)
+            cursorCatModel = model
+        } else {
+            let placeholder = ModelEntity(
+                mesh: .generateSphere(radius: 0.5),
+                materials: [SimpleMaterial(color: .systemPink, isMetallic: false)]
+            )
+            cursorCat.addChild(placeholder)
+            cursorCatModel = placeholder
+        }
+        if let model = cursorCatModel {
+            let scale: Float = 0.00009
+            model.scale = [scale, scale, scale]
+        }
+        content.add(cursorCat)
+        let catRef = CursorCatRef()
+        catRef.entity = cursorCat
+        catRef.model = cursorCatModel
+        cursorCatRefs.cats[slot] = catRef
+
+        // Update legacy single-pane refs when the origin is spawned.
+        if slot == .origin {
+            terminalPlaneRef.entity = plane
+            terminalPlaneBackRef.entity = back
+            cursorCatRef.entity = cursorCat
+            cursorCatRef.model = cursorCatModel
+        }
+    }
+
+    @MainActor
+    private func despawnPaneEntities(at slot: PaneSlot) {
+        paneRefs.fronts[slot]?.entity?.removeFromParent()
+        paneRefs.fronts.removeValue(forKey: slot)
+        paneRefs.backs[slot]?.entity?.removeFromParent()
+        paneRefs.backs.removeValue(forKey: slot)
+        paneRefs.glows[slot]?.removeFromParent()
+        paneRefs.glows.removeValue(forKey: slot)
+        cursorCatRefs.cats[slot]?.entity?.removeFromParent()
+        cursorCatRefs.cats.removeValue(forKey: slot)
+    }
+
     /// Toggle each pane's front + back entity `isEnabled` based on
     /// whether the user has spawned into that slot. Cheap (just sets
     /// a Bool on the entity) so we can run it every frame.
     @MainActor
     private func syncPaneVisibility() {
-        for slot in PaneSlot.allCases {
+        for slot in panes.keys {
             let active = panes[slot] != nil
             paneRefs.fronts[slot]?.entity?.isEnabled = active
             paneRefs.backs[slot]?.entity?.isEnabled = active
+            // Selection glow: only enabled when this slot has a pane
+            // AND the slot matches the currently-active selection.
+            paneRefs.glows[slot]?.isEnabled = active && (slot == activeSlot)
         }
     }
 
@@ -276,7 +398,7 @@ public struct Terminal3DRealityScene: View {
         // version counter used by the original single-pane code path,
         // so non-centre panes get the same skip-when-clean fast path.
         let alpha = max(0, min(1, config.terminalOpacity))
-        for slot in PaneSlot.allCases {
+        for slot in panes.keys {
             guard let source = panes[slot],
                   let ref = paneRefs.fronts[slot],
                   let plane = ref.entity,
@@ -307,7 +429,7 @@ public struct Terminal3DRealityScene: View {
         // mode to its plane. Back plane is hidden for Möbius (a
         // one-sided surface — front material's faceCulling = .none
         // handles double-sided rendering).
-        for slot in PaneSlot.allCases {
+        for slot in panes.keys {
             let mode = surfaceModes[slot] ?? .flat
             guard let ref = paneRefs.fronts[slot],
                   let plane = ref.entity,
@@ -512,6 +634,76 @@ public struct Terminal3DRealityScene: View {
                          uvs: uvs, indices: indices)
     }
 
+    /// Procedural selection-glow texture: transparent middle, purple
+    /// outer ring that softens toward the edge. Lives behind the
+    /// terminal plane on the active slot's glow entity, so it reads
+    /// as a halo around the pane regardless of camera angle.
+    private func makeSelectionGlowTexture() -> TextureResource? {
+        let width = 1024
+        let height = 696
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        // Soft purple — same colour family as the SwiftUI halo we
+        // had previously, just baked into a texture so it can ride
+        // the RealityKit transform.
+        let r: Double = 160.0
+        let g: Double = 95.0
+        let b: Double = 215.0
+
+        // Texture coords map to a plane slightly larger than the
+        // terminal pane (1.6 × 1.05). The portion of the glow that
+        // would sit *inside* the pane is hidden by the terminal
+        // plane in front of it, so we just need a soft outward
+        // falloff from the pane edge.
+        //
+        // Texture plane is (textureW × textureH) world-units below.
+        let textureW: Double = 1.72        // pane width  + small halo room
+        let textureH: Double = 1.13        // pane height + small halo room
+        let paneW: Double = 1.6
+        let paneH: Double = 1.05
+        let sigma: Double = 0.018          // tight halo — falls off fast
+        let maxAlpha: Double = 0.28        // gentle, never pure-purple
+
+        for y in 0..<height {
+            for x in 0..<width {
+                let nx = Double(x) / Double(width - 1)
+                let ny = Double(y) / Double(height - 1)
+                // Convert pixel to a world-space offset from the
+                // texture centre.
+                let tx = (nx - 0.5) * textureW
+                let ty = (0.5 - ny) * textureH
+                // Distance outward from the nearest pane edge.
+                // 0 anywhere inside the pane footprint, positive
+                // outside (Euclidean for the corners).
+                let dx = max(0, abs(tx) - paneW / 2)
+                let dy = max(0, abs(ty) - paneH / 2)
+                let dOut = sqrt(dx * dx + dy * dy)
+                // Gaussian halo: brightest right at the edge, fades
+                // smoothly as we move outward into space.
+                let g_alpha = exp(-(dOut * dOut) / (sigma * sigma))
+                let alpha = maxAlpha * g_alpha
+                let idx = (y * width + x) * 4
+                pixels[idx + 0] = UInt8(r)
+                pixels[idx + 1] = UInt8(g)
+                pixels[idx + 2] = UInt8(b)
+                pixels[idx + 3] = UInt8(max(0, min(255, alpha * 255)))
+            }
+        }
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        guard let context = CGContext(
+            data: &pixels,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: width * 4,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo.rawValue
+        ) else { return nil }
+        guard let cgImage = context.makeImage() else { return nil }
+        let options = TextureResource.CreateOptions(semantic: .color)
+        return try? TextureResource(image: cgImage, options: options)
+    }
+
     /// Procedural texture for the back of the terminal: a grid of cells
     /// suggesting "this is where text would be" without rendering the
     /// live text. Generated once at scene-build time; cell opacity
@@ -624,13 +816,13 @@ public struct Terminal3DRealityScene: View {
             sharedBackMaterial.color = .init(tint: .white, texture: .init(backGrid))
         }
 
-        for slot in PaneSlot.allCases {
+        for slot in panes.keys {
             let plane = ModelEntity(
                 mesh: .generatePlane(width: 1.6, height: 1.05, cornerRadius: 0),
                 materials: [UnlitMaterial(color: .black)]
             )
             plane.position = slot.worldPosition
-            plane.isEnabled = (slot == .centre)
+            plane.isEnabled = (slot == .origin)
             content.add(plane)
 
             let back = ModelEntity(
@@ -640,7 +832,7 @@ public struct Terminal3DRealityScene: View {
             back.orientation = simd_quatf(angle: .pi, axis: [0, 1, 0])
             // Tiny -Z offset prevents z-fighting with the front plane.
             back.position = slot.worldPosition + [0, 0, -0.001]
-            back.isEnabled = (slot == .centre)
+            back.isEnabled = (slot == .origin)
             content.add(back)
 
             let frontRef = TerminalPlaneRef()
@@ -651,12 +843,41 @@ public struct Terminal3DRealityScene: View {
             backRef.entity = back
             paneRefs.backs[slot] = backRef
 
-            if slot == .centre {
+            if slot == .origin {
                 // Preserve the legacy single-pane refs so the existing
                 // texture/surface-mode update paths keep operating on
                 // the centre plane without rewrites.
                 terminalPlaneRef.entity = plane
                 terminalPlaneBackRef.entity = back
+            }
+
+            // Selection-glow plane: slightly larger than the
+            // terminal plane, parked just behind it, textured with a
+            // purple edge-only outline. Enabled per-frame for the
+            // active slot only — by living in the RealityKit scene
+            // it inherits the camera's view transform, so the glow
+            // tracks the pane as the user orbits.
+            if let glowTexture = makeSelectionGlowTexture() {
+                var glowMaterial = UnlitMaterial()
+                glowMaterial.color = .init(tint: .white, texture: .init(glowTexture))
+                glowMaterial.blending = .transparent(opacity: .init(floatLiteral: 1.0))
+                glowMaterial.faceCulling = .none
+                // Glow plane footprint matches the texture's
+                // generation extents so each texel maps to the
+                // world-position it was rendered for. Just enough
+                // bigger than the pane to contain the falloff.
+                let glow = ModelEntity(
+                    mesh: .generatePlane(width: 1.72, height: 1.13, cornerRadius: 0),
+                    materials: [glowMaterial]
+                )
+                // Just behind the front plane so the texture's
+                // transparent middle reveals the terminal underneath.
+                // Slightly larger so the purple ring extends past
+                // the pane edges.
+                glow.position = slot.worldPosition + [0, 0, -0.002]
+                glow.isEnabled = false
+                content.add(glow)
+                paneRefs.glows[slot] = glow
             }
         }
 
@@ -714,7 +935,7 @@ public struct Terminal3DRealityScene: View {
         // USDZ instances from the orbiter; positioned per-frame by
         // `updateCursorCat`. Cardinals start hidden and become
         // visible when the user spawns into the slot.
-        for slot in PaneSlot.allCases {
+        for slot in panes.keys {
             let cursorCat = Entity()
             cursorCat.name = "cursorCat-\(slot.rawValue)"
             var cursorCatModel: Entity?
@@ -736,7 +957,7 @@ public struct Terminal3DRealityScene: View {
                 let scale: Float = 0.00009
                 model.scale = [scale, scale, scale]
             }
-            cursorCat.isEnabled = (slot == .centre)
+            cursorCat.isEnabled = (slot == .origin)
             content.add(cursorCat)
 
             let ref = CursorCatRef()
@@ -744,7 +965,7 @@ public struct Terminal3DRealityScene: View {
             ref.model = cursorCatModel
             cursorCatRefs.cats[slot] = ref
 
-            if slot == .centre {
+            if slot == .origin {
                 // Keep the legacy single-cat ref in sync so any code
                 // that still references it operates on the centre cat.
                 cursorCatRef.entity = cursorCat
@@ -758,7 +979,7 @@ public struct Terminal3DRealityScene: View {
     /// and bobs on a sine, mirroring ratty's cursor-model animation.
     @MainActor
     private func updateCursorCat(elapsed: TimeInterval) {
-        for slot in PaneSlot.allCases {
+        for slot in panes.keys {
             updateCursorCat(elapsed: elapsed, slot: slot)
         }
     }
@@ -823,6 +1044,10 @@ final class MultiPanePlaneRefs {
     /// cardinals are added in `update` as they spawn.
     var fronts: [PaneSlot: TerminalPlaneRef] = [:]
     var backs: [PaneSlot: TerminalPlaneRef] = [:]
+    /// Per-slot purple selection glow planes parented just behind
+    /// the front plane. Only one is `isEnabled = true` at a time —
+    /// the one matching the currently-active slot.
+    var glows: [PaneSlot: ModelEntity] = [:]
     /// Anchor parent for every pane in this scene, so adding /
     /// removing planes happens by parenting to a single node rather
     /// than walking `content` for ad-hoc additions.

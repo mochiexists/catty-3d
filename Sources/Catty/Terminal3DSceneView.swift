@@ -173,6 +173,16 @@ public struct Terminal3DSceneView: View {
     /// passes `false` here — no package-side close affordance.
     let showsCloseButton: Bool
 
+    /// When `true`, the scene's `.onDisappear` calls `.stop()` on every
+    /// pane source so PTYs / SSH transports are torn down with the view.
+    /// Default is `false` — keeps the existing standalone-Catty
+    /// behaviour where the scene view tree is preserved across window
+    /// hide/show and the shells keep running. Hosts that present the
+    /// scene in a transient container (singleton SwiftUI `Window` that
+    /// the user closes and re-opens, sheets, etc.) should pass `true`
+    /// so a close means a real close.
+    let stopsPanesOnDisappear: Bool
+
     /// Every active terminal pane, keyed by spatial slot. Centre is
     /// always populated (the initial session); cardinals get filled
     /// when the user spawns from the add-terminals mode. All five
@@ -199,19 +209,19 @@ public struct Terminal3DSceneView: View {
     /// via `paneFocusOverlay`; surfaces a blue selection outline
     /// and drives per-pane controls like surface mode. Defaults
     /// to centre on cold start.
-    @State private var activeSlot: PaneSlot = .centre
+    @State private var activeSlot: PaneSlot = .origin
 
     /// Per-pane surface mode. Cycle button applies to `activeSlot`
     /// only — different panes can sit on different shapes (flat
     /// next to curved next to mobius). Centre defaults to flat;
     /// new spawns inherit flat too.
-    @State private var surfaceModes: [PaneSlot: TerminalSurfaceMode] = [.centre: .flat]
+    @State private var surfaceModes: [PaneSlot: TerminalSurfaceMode] = [.origin: .flat]
 
     /// Convenience: the centre pane's source. Always non-nil because
     /// centre is set in init and never removed.
     private var centreSource: TerminalLiveTextureSource {
         // swiftlint:disable:next force_unwrapping
-        panes[.centre]!
+        panes[.origin]!
     }
 
     /// Dismiss action — pulled from the surrounding sheet so the close
@@ -221,10 +231,12 @@ public struct Terminal3DSceneView: View {
     public init(
         mode: CattyTerminalSourceMode = .local,
         workingDirectory: URL? = nil,
-        showsCloseButton: Bool = true
+        showsCloseButton: Bool = true,
+        stopsPanesOnDisappear: Bool = false
     ) {
         self.mode = mode
         self.showsCloseButton = showsCloseButton
+        self.stopsPanesOnDisappear = stopsPanesOnDisappear
         self.initialWorkingDirectory = workingDirectory
 
         // Cold-start: rehydrate the user's last multi-pane layout if
@@ -234,12 +246,12 @@ public struct Terminal3DSceneView: View {
         // picker doesn't get silently overridden by stale state.
         // Cardinals come from the persisted layout (.local only).
         var initial: [PaneSlot: TerminalLiveTextureSource] = [
-            .centre: TerminalLiveTextureSource(mode: mode, workingDirectory: workingDirectory)
+            .origin: TerminalLiveTextureSource(mode: mode, workingDirectory: workingDirectory)
         ]
         if case .local = mode, let layout = CattyLayoutStore.load() {
             for persisted in layout.panes {
                 guard let slot = PaneSlot(rawValue: persisted.slot),
-                      slot != .centre else { continue }
+                      slot != .origin else { continue }
                 let url = persisted.workingDirectory.map {
                     URL(fileURLWithPath: $0, isDirectory: true)
                 } ?? workingDirectory
@@ -258,7 +270,7 @@ public struct Terminal3DSceneView: View {
     /// Saves the updated layout to disk so the user picks up where
     /// they left off on next launch.
     private func spawnPane(at slot: PaneSlot) {
-        guard slot != .centre, panes[slot] == nil else { return }
+        guard slot != .origin, panes[slot] == nil else { return }
         let source = TerminalLiveTextureSource(
             mode: .local,
             workingDirectory: initialWorkingDirectory
@@ -274,6 +286,24 @@ public struct Terminal3DSceneView: View {
         persistLayout()
     }
 
+    /// Tear down a spawned pane. Centre is never removable (it's
+    /// the always-present session). Stops the underlying source so
+    /// the shell process exits cleanly, drops the surface-mode
+    /// entry, and persists the layout. If the deleted slot was the
+    /// active selection, focus falls back to centre.
+    private func removePane(at slot: PaneSlot) {
+        guard slot != .origin, let source = panes[slot] else { return }
+        source.stop()
+        withAnimation(.easeInOut(duration: 0.25)) {
+            panes[slot] = nil
+            surfaceModes[slot] = nil
+            if activeSlot == slot {
+                activeSlot = .origin
+            }
+        }
+        persistLayout()
+    }
+
     /// Snapshot the current panes dict into UserDefaults. Centre is
     /// always recorded with the working dir the caller passed at
     /// init; cardinals are local-mode panes rooted at the same dir.
@@ -281,17 +311,35 @@ public struct Terminal3DSceneView: View {
     /// remote shell needs a credential prompt, not a silent restore.
     private func persistLayout() {
         var snapshot: [PaneSlot: URL?] = [:]
-        for slot in PaneSlot.allCases where panes[slot] != nil {
+        for slot in panes.keys {
             snapshot[slot] = initialWorkingDirectory
         }
         CattyLayoutStore.save(panes: snapshot)
     }
 
     /// Deterministic ordering of panes for the offscreen embeds.
-    /// Centre first (it's the always-present one), then cardinals
-    /// in a stable order so SwiftUI's ForEach doesn't tear views.
+    /// Sort by row then column so SwiftUI's ForEach has a stable
+    /// list — without this, re-renders could tear the embeds.
     private var activePaneOrder: [PaneSlot] {
-        PaneSlot.allCases.filter { panes[$0] != nil }
+        panes.keys.sorted { a, b in
+            (a.row, a.column) < (b.row, b.column)
+        }
+    }
+
+    /// Set of grid cells the user can spawn into right now — every
+    /// empty cell that's a cardinal neighbour of at least one filled
+    /// cell. Grows as the user spawns new panes.
+    private var spawnCoords: [PaneSlot] {
+        var seen = Set<PaneSlot>()
+        var result: [PaneSlot] = []
+        for coord in panes.keys {
+            for neighbour in coord.neighbours() where panes[neighbour] == nil {
+                if seen.insert(neighbour).inserted {
+                    result.append(neighbour)
+                }
+            }
+        }
+        return result
     }
 
     /// Shared tunable orbit params. Driven by OrbitDebugSliders,
@@ -412,12 +460,12 @@ public struct Terminal3DSceneView: View {
         // bug + the cat/rat lag.
         .onAppear {
             // Start every active pane, not just the centre. Restored
-            // cardinals from `CattyLayoutStore` were getting created
-            // in init but never woken up — relaunch would show their
+            // panes from `CattyLayoutStore` were getting created in
+            // init but never woken up — relaunch would show their
             // textures still black because the underlying shell had
             // not been spawned.
-            for slot in PaneSlot.allCases {
-                panes[slot]?.start()
+            for source in panes.values {
+                source.start()
             }
             // Give the SwiftUI sheet one runloop tick to mount the embed
             // and attach the terminal NSView to the window before asking
@@ -430,6 +478,15 @@ public struct Terminal3DSceneView: View {
         }
         .onDisappear {
             removeScrollMonitor()
+            // Host-opt-in teardown: when the embedding window/sheet
+            // closes, tear down every pane's PTY / SSH transport so a
+            // re-open starts a real new session. Standalone Catty.app
+            // leaves this false and lets shells outlive the view tree.
+            if stopsPanesOnDisappear {
+                for source in panes.values {
+                    source.stop()
+                }
+            }
         }
     }
 
@@ -480,19 +537,12 @@ public struct Terminal3DSceneView: View {
         GeometryReader { geo in
             ForEach(activePaneOrder, id: \.self) { slot in
                 let frame = projectedPaneFrame(for: slot, in: geo.size)
-                ZStack {
-                    // Soft purple edge-glow on the active pane. Stroke
-                    // only (no fill), with a small blur so the line
-                    // softens into a halo at the very edge of the
-                    // pane. No haze across the body — the terminal
-                    // content stays unobstructed.
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(Color.purple.opacity(0.75), lineWidth: 2)
-                        .blur(radius: 2.5)
-                        .opacity(activeSlot == slot ? 1 : 0)
-                        .animation(.easeInOut(duration: 0.2), value: activeSlot)
-                    Color.clear.contentShape(Rectangle())
-                }
+                // Selection glow now lives inside the RealityKit
+                // scene (see Terminal3DRealityScene's per-pane glow
+                // plane) so it follows the pane as the user orbits.
+                // This overlay only carries the invisible click
+                // target.
+                Color.clear.contentShape(Rectangle())
                 .frame(width: frame.width, height: frame.height)
                 .position(x: frame.midX, y: frame.midY)
                 .onTapGesture {
@@ -538,25 +588,33 @@ public struct Terminal3DSceneView: View {
         return CGRect(x: cx - w / 2, y: cy - h / 2, width: w, height: h)
     }
 
-    /// SwiftUI overlay that draws four directional spawn arrows
-    /// around the centre of the scene when `addTerminalsMode` is on.
-    /// Empty slots show a "+ arrow" affordance; filled slots are
-    /// hidden so the user knows where they can still expand.
+    /// SwiftUI overlay shown while `addTerminalsMode` is on.
+    /// Empty cardinals get a `+ arrow` affordance to spawn a new
+    /// pane in that direction; filled cardinals get an `✕` close
+    /// chip parked on the pane itself for tear-down. Toggling the
+    /// rail button off hides both.
+    /// SwiftUI overlay shown while `addTerminalsMode` is on.
+    /// • Empty grid cells adjacent to any filled pane get a small
+    ///   translucent purple square at their projected screen
+    ///   position; click to spawn into that cell. The new pane's
+    ///   own empty neighbours then expose more spawn squares, so
+    ///   the grid grows organically.
+    /// • Filled non-origin panes get an ✕ close chip — click to
+    ///   tear down (origin is permanent).
     private var spawnArrowsOverlay: some View {
         GeometryReader { geo in
-            let cx = geo.size.width / 2
-            let cy = geo.size.height / 2
-            // Distance from centre to each arrow, expressed in
-            // screen space. Keeps the arrows clearly outside the
-            // centre pane's footprint at the default 100% zoom.
-            let radius: CGFloat = min(geo.size.width, geo.size.height) * 0.30
-            ForEach([PaneSlot.north, .south, .east, .west], id: \.self) { slot in
-                if panes[slot] == nil {
-                    spawnArrow(for: slot)
-                        .position(
-                            x: cx + offsetForArrow(slot).width * radius,
-                            y: cy + offsetForArrow(slot).height * radius
-                        )
+            ForEach(spawnCoords, id: \.self) { coord in
+                let frame = projectedPaneFrame(for: coord, in: geo.size)
+                spawnSquare(for: coord)
+                    .frame(width: frame.width * 0.85, height: frame.height * 0.85)
+                    .position(x: frame.midX, y: frame.midY)
+                    .transition(.scale.combined(with: .opacity))
+            }
+            ForEach(activePaneOrder, id: \.self) { coord in
+                if coord != .origin {
+                    let frame = projectedPaneFrame(for: coord, in: geo.size)
+                    closeChip(for: coord)
+                        .position(x: frame.midX, y: frame.midY)
                         .transition(.scale.combined(with: .opacity))
                 }
             }
@@ -564,11 +622,36 @@ public struct Terminal3DSceneView: View {
         .allowsHitTesting(true)
     }
 
+    /// Translucent purple square the user taps to spawn a new pane
+    /// at `coord`. Sized to roughly match the projected pane
+    /// footprint so it reads as "a terminal would go here".
+    private func spawnSquare(for coord: PaneSlot) -> some View {
+        Button {
+            spawnPane(at: coord)
+        } label: {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color.purple.opacity(0.18))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Color.purple.opacity(0.55), lineWidth: 2)
+                )
+                .overlay(
+                    Image(systemName: "plus")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.7))
+                )
+        }
+        .buttonStyle(.plain)
+        .help("Spawn a new local terminal here")
+    }
+
+    // (legacy cardinal arrow API kept below for reference — unused
+    // now that spawning is grid-coord based.)
     private func spawnArrow(for slot: PaneSlot) -> some View {
         Button {
             spawnPane(at: slot)
         } label: {
-            Image(systemName: slot.arrowSystemName)
+            Image(systemName: "plus.circle.fill")
                 .font(.system(size: 36, weight: .medium))
                 .foregroundStyle(.white.opacity(0.95))
                 .frame(width: 56, height: 56)
@@ -579,15 +662,24 @@ public struct Terminal3DSceneView: View {
         .help("Spawn a new local terminal to the \(slot.rawValue)")
     }
 
-    private func offsetForArrow(_ slot: PaneSlot) -> CGSize {
-        switch slot {
-        case .north:  return CGSize(width: 0, height: -1)
-        case .south:  return CGSize(width: 0, height: 1)
-        case .east:   return CGSize(width: 1, height: 0)
-        case .west:   return CGSize(width: -1, height: 0)
-        case .centre: return .zero
+    private func closeChip(for slot: PaneSlot) -> some View {
+        Button {
+            removePane(at: slot)
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.95))
+                .frame(width: 44, height: 44)
+                .background(.red.opacity(0.7), in: Circle())
+                .overlay(Circle().stroke(.white.opacity(0.25), lineWidth: 1))
         }
+        .buttonStyle(.plain)
+        .help("Remove the \(slot.rawValue) terminal")
     }
+
+    // offsetForArrow is no longer needed — spawn squares are
+    // positioned by projecting the target coord's worldPosition
+    // through the camera (see projectedPaneFrame).
 
     /// Plain drag. Always rotates — in orbit mode that's a turntable
     /// spin around the terminal; in FPV mode it's a fixed-position
@@ -692,7 +784,8 @@ public struct Terminal3DSceneView: View {
                 lookPitch: Float(userPitch),
                 panOffset: panOffset,
                 cameraMode: cameraMode,
-                surfaceModes: surfaceModes
+                surfaceModes: surfaceModes,
+                activeSlot: activeSlot
             )
         }
         .ignoresSafeArea()
