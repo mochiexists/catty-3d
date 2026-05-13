@@ -1,0 +1,9 @@
+Catty is a developer-tools terminal app. It opens the user's default shell (zsh by default) in a chosen folder and can also connect to remote hosts over SSH using user-provided credentials. No user data is collected or transmitted to any server controlled by the developer — all shell input/output stays on the user's machine or flows directly to the SSH host they specified.
+
+The 3D scene is rendered using Apple's RealityKit framework. The bundled 3D models (Maxwell the cat USDZ from bean on Sketchfab under CC-BY 4.0, and the rat model from Orhun's Ratty repository under MIT) ship with the application; attribution is documented inside the app under the right-rail info popover and at github.com/mochiexists/catty.
+
+To test the local terminal: launch Catty, click "New Local Session", pick any folder (e.g. Documents), click Open. A zsh prompt should appear inside the 3D scene with the cat sitting next to it.
+
+To test SSH: click "New SSH Session", enter any reachable SSH host + credentials. The remote shell renders identically to the local one.
+
+Catty is open source under the MIT license.

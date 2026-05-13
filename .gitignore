@@ -11,6 +11,10 @@ fastlane/Preview.html
 fastlane/screenshots/
 fastlane/test_output/
 fastlane/.env
+fastlane/.env.*
+!fastlane/.env.example
+fastlane/build/
+fastlane/screenshots/macos/*.png
 *.profraw
 
 # Local signing + identifier overrides. Each contributor maintains

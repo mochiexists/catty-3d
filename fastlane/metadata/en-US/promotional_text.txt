@@ -1,0 +1,1 @@
+Your terminal, but rendered in 3D space — orbit the camera, spawn more terminals in any direction, and let Maxwell the cat watch your cursor while a rat circles nearby.

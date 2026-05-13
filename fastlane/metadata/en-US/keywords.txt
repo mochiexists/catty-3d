@@ -1,0 +1,1 @@
+terminal,ssh,shell,3d,developer,realitykit,terminal emulator,ssh client,multi terminal,zsh

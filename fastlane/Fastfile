@@ -1,16 +1,33 @@
 # Catty Fastfile
 #
-# Minimal lane set for the standalone Catty app. Mirrors the conventions
-# in Local AI Chat's Fastfile (which is much larger because it owns
-# TestFlight, App Store upload, Direct Download notarization, etc.) but
-# starts small here — we'll grow it as Phase 5 (distribution pipeline)
-# lands.
+# Lanes for both distribution channels:
 #
-# Lanes today:
-#   • fastlane generate_project — wraps `xcodegen generate`.
-#   • fastlane mac screenshots  — UI-test-driven screenshot capture.
+#   • Indoor (Mac App Store)
+#       fastlane mac beta              → upload to TestFlight
+#       fastlane mac release           → upload to App Store Connect (and
+#                                        optionally submit for review)
+#       fastlane mac upload_metadata   → push App Store strings only
+#       fastlane mac upload_screenshots → push fastlane/screenshots only
 #
-# Add releases / notarization in Phase 5.
+#   • Outdoor (Direct Download — DMG, signed + notarized)
+#       fastlane mac direct_release    → build, sign, notarize, produce DMG
+#                                        (publishing to a release-host repo
+#                                        is the next step's job)
+#
+#   • Local convenience
+#       fastlane generate_project      → wraps `xcodegen generate`
+#       fastlane mac screenshots       → UI-test-driven captures
+#
+# Required env vars (set via `fastlane/.env` locally OR Actions secrets in
+# CI — never commit them):
+#
+#   FASTLANE_USER                  Apple ID email
+#   FASTLANE_PASSWORD              ASC password (or ASC API key — preferred)
+#   FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD   For TestFlight upload
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH        Preferred over user/pass
+#   DEVELOPMENT_TEAM               Apple Developer Team ID (also in Local.xcconfig)
+#   MATCH_PASSWORD                 If using fastlane match for cert mgmt
+#   FASTLANE_NOTARIZATION_USER     Notarytool credential keychain profile name
 
 fastlane_version "2.231.0"
 
@@ -30,6 +47,9 @@ end
 # ============================================================================
 
 platform :mac do
+  # --------------------------------------------------------------------------
+  # Screenshots
+  # --------------------------------------------------------------------------
   desc "Capture macOS screenshots via UI tests"
   lane :screenshots do
     capture_screenshots(
@@ -39,7 +59,138 @@ platform :mac do
       stop_after_first_error: true,
       reinstall_app: false,
       erase_simulator: false,
-      devices: nil  # macOS host; no simulator selection
+      devices: nil
     )
   end
+
+  # --------------------------------------------------------------------------
+  # TestFlight (Indoor)
+  # --------------------------------------------------------------------------
+  desc "Upload macOS build to TestFlight"
+  lane :beta do
+    api_key = asc_api_key_or_nil
+    build_app_store_archive
+    upload_to_testflight(
+      api_key: api_key,
+      pkg: built_pkg_path,
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  # --------------------------------------------------------------------------
+  # App Store release (Indoor)
+  # --------------------------------------------------------------------------
+  desc "Upload macOS build to App Store Connect"
+  lane :release do |options|
+    submit_for_review = truthy_option?(options[:submit_for_review], default: false)
+    automatic_release = truthy_option?(options[:automatic_release], default: false)
+    api_key = asc_api_key_or_nil
+
+    build_app_store_archive
+
+    upload_to_app_store(
+      api_key: api_key,
+      pkg: built_pkg_path,
+      skip_screenshots: true,
+      skip_metadata: false,
+      submit_for_review: submit_for_review,
+      automatic_release: automatic_release,
+      precheck_include_in_app_purchases: false,
+      force: false
+    )
+  end
+
+  # --------------------------------------------------------------------------
+  # Metadata-only push
+  # --------------------------------------------------------------------------
+  desc "Push fastlane/metadata/* to App Store Connect (no binary)"
+  lane :upload_metadata do
+    api_key = asc_api_key_or_nil
+    deliver(
+      api_key: api_key,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      force: true
+    )
+  end
+
+  desc "Push fastlane/screenshots/* to App Store Connect (no binary)"
+  lane :upload_screenshots do
+    api_key = asc_api_key_or_nil
+    deliver(
+      api_key: api_key,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      force: true
+    )
+  end
+
+  # --------------------------------------------------------------------------
+  # Direct Download (Outdoor) — notarized DMG
+  # --------------------------------------------------------------------------
+  desc "Build, sign, and notarize the Direct Download DMG"
+  lane :direct_release do
+    UI.user_error!("Outdoor pipeline scaffold — implement signing + notarytool calls when secrets are wired (see docs/release/RELEASE.md).")
+    # Outline of what this lane will do once secrets land:
+    #   1. xcodegen generate
+    #   2. gym → archive + export Developer ID-signed .app
+    #   3. dmgcanvas / create-dmg → produce Catty-X.Y.Z.dmg
+    #   4. notarize_with_notarytool → submit + staple
+    #   5. (next workflow) push to mochiexists/catatui-site GH release
+    #   6. (next workflow) update Sparkle appcast.xml + Homebrew cask
+  end
+end
+
+# ============================================================================
+# Helpers
+# ============================================================================
+
+def truthy_option?(value, default:)
+  return default if value.nil?
+  ["true", "1", "yes", "y"].include?(value.to_s.downcase)
+end
+
+# Returns an `app_store_connect_api_key` hash if the ASC_KEY_* env vars are
+# present; otherwise nil so Fastlane falls back to the interactive Apple ID
+# auth path (FASTLANE_USER / FASTLANE_PASSWORD). Preferred for CI.
+def asc_api_key_or_nil
+  return nil unless ENV["ASC_KEY_ID"] && ENV["ASC_ISSUER_ID"]
+  key_path = ENV["ASC_KEY_PATH"]
+  if key_path && File.exist?(key_path)
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_filepath: key_path,
+      duration: 1200
+    )
+  elsif ENV["ASC_KEY_CONTENT"]
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      is_key_content_base64: true,
+      duration: 1200
+    )
+  else
+    nil
+  end
+end
+
+# Build the Mac App Store archive + export a signed .pkg ready for ASC upload.
+# Outputs the .pkg into fastlane/build/macos/.
+def build_app_store_archive
+  sh "cd .. && xcodegen generate"
+  build_mac_app(
+    workspace: nil,
+    project: "Catty.xcodeproj",
+    scheme: "Catty (App Store)",
+    configuration: "Release",
+    export_method: "app-store",
+    output_directory: "./fastlane/build/macos",
+    output_name: "Catty"
+  )
+end
+
+def built_pkg_path
+  File.expand_path("../fastlane/build/macos/Catty.pkg", __dir__)
 end
