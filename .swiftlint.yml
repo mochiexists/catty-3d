@@ -1,0 +1,56 @@
+# SwiftLint configuration for Catty.
+#
+# Philosophy mirrors Local AI Chat's: block on real issues, warn on
+# style improvements. Scope tightly to first-party Swift in `App/` and
+# `UITests/`; third-party code (SwiftTerm, Citadel, NIO, SwiftPM
+# checkouts) is excluded.
+
+included:
+  - App
+  - UITests
+
+excluded:
+  - "**/Generated"
+  - "**/*.generated.swift"
+  - .build
+  - "**/.build"
+  - Pods
+  - Carthage
+  - Catty.xcodeproj
+  # Vendored from Fastlane's snapshot template; keep it byte-identical
+  # so future `fastlane snapshot update` re-runs apply cleanly.
+  - UITests/SnapshotHelper.swift
+
+disabled_rules:
+  # SwiftUI uses multiple trailing closures everywhere.
+  - multiple_closures_with_trailing_closure
+  # Body length and file length checks are noisy on view layout code.
+  - type_body_length
+  - file_length
+  - function_body_length
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - explicit_init
+  - first_where
+  - sorted_imports
+  - vertical_whitespace_between_cases
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+
+identifier_name:
+  min_length: 1
+  excluded:
+    - id
+    - x
+    - y
+    - z
+    - u
+    - v
+
+reporter: "xcode"

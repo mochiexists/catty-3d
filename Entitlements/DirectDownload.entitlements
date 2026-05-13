@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Outdoor (Direct Download) entitlements for Catty.
+
+  No app sandbox: a local terminal session spawns the user's shell as
+  a child process, and the SSH transport opens arbitrary outbound
+  TCP connections (port 22 by default but the user can change it).
+  Both pieces work fine inside the sandbox too — see AppStore.entitlements
+  for the Indoor variant — but the unsandboxed build is convenient for
+  developers using Direct Download as the daily driver.
+
+  Hardened Runtime is enabled in project.yml (ENABLE_HARDENED_RUNTIME=YES)
+  and notarization is required for distribution outside the Mac App
+  Store. JIT, unsigned-memory, and DYLD-env are NOT requested — Catty
+  doesn't need any of them.
+-->
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <false/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <false/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <false/>
+</dict>
+</plist>

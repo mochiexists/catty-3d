@@ -1,0 +1,24 @@
+# Appfile — App Store Connect / Apple Developer wiring.
+#
+# Left blank in the committed file. Real values come from one of two
+# places at fastlane invocation time:
+#
+#   1. Locally — your gitignored `fastlane/.env` file or an
+#      `.env.<lane>` variant, picked up by dotenv. Useful while
+#      iterating on a lane.
+#   2. CI — GitHub Actions secrets exposed as env vars.
+#
+# Variables Fastlane reads:
+#
+#   FASTLANE_USER         Apple ID email
+#   FASTLANE_TEAM_ID      Apple Developer Team ID
+#   FASTLANE_ITC_TEAM_ID  ASC team ID (usually matches Developer team)
+#
+# Per-lane bundle identifiers are read from the project itself (via
+# `PRODUCT_BUNDLE_IDENTIFIER` set in `project.yml`'s targets), so we
+# don't restate them here.
+
+# Uncomment + override locally if you need to pin values for a lane:
+# app_identifier ENV["CATTY_APP_IDENTIFIER"]
+# team_id        ENV["FASTLANE_TEAM_ID"]
+# apple_id       ENV["FASTLANE_USER"]

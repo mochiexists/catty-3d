@@ -1,0 +1,35 @@
+// Local.example.xcconfig
+//
+// Template for the gitignored `Local.xcconfig` that supplies signing
+// identifiers and bundle ID prefix to Xcode without leaking them into
+// the public repository.
+//
+// On first checkout:
+//
+//     cp Local.example.xcconfig Local.xcconfig
+//
+// Then edit `Local.xcconfig` to fill in your Apple Developer Team ID
+// and choose a bundle-ID prefix that you own (reverse-DNS namespace —
+// e.g. `com.example`, `io.yourdomain`, etc.). The defaults below are
+// intentionally placeholders so fork builds don't accidentally collide
+// with someone else's App Store record.
+//
+// For CI, these same values come from GitHub Actions secrets (or
+// equivalent) rather than a committed file. See `.github/workflows/`
+// for the env-var wiring.
+
+// Apple Developer Team ID (10-char alphanumeric, visible in
+// developer.apple.com → Membership). Leave empty for unsigned local
+// builds (CODE_SIGNING_ALLOWED=NO on the xcodebuild invocation).
+DEVELOPMENT_TEAM =
+
+// Bundle ID prefix. Combined with `.Catty` and `.Catty.AppStore` for
+// the two macOS targets. Pick something you own — reverse-DNS of a
+// domain works; "com.example" is a placeholder that App Store
+// Connect will reject.
+BUNDLE_ID_PREFIX = com.example
+
+// Sparkle EdDSA public key for verifying Direct Download appcast
+// signatures. Generate with `Sparkle/bin/generate_keys`; commit only
+// the public half. Leave empty until Sparkle is wired in Phase 5.
+SPARKLE_ED_PUBLIC_KEY =

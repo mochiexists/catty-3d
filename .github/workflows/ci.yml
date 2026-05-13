@@ -1,0 +1,72 @@
+# CI for Catty
+#
+# Mirrors local-ai-cat/Local-AI-Chat's ci.yml shape so reviewers know
+# what to expect: lint then build on macOS for both Outdoor + Indoor
+# schemes. Dormant until the repo gets a remote at mochiexists/catty.
+#
+# All workflow inputs that come from event metadata (e.g. matrix names,
+# inputs) are passed via env: rather than inline ${{ }} interpolation
+# inside run: blocks — see GitHub's Actions injection guidance.
+
+name: CI
+
+on:
+  push:
+    branches: [main, outdoor-cat]
+    paths-ignore:
+      - "**/*.md"
+      - "fastlane/screenshots/**"
+      - "fastlane/metadata/**"
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "fastlane/screenshots/**"
+      - "fastlane/metadata/**"
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: Run SwiftLint
+        run: swiftlint lint --quiet --reporter github-actions-logging
+
+  build:
+    runs-on: macos-26
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        scheme:
+          - "Catty"
+          - "Catty (App Store)"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install XcodeGen + xcbeautify
+        run: brew install xcodegen xcbeautify
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Build
+        env:
+          INPUT_SCHEME: ${{ matrix.scheme }}
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Catty.xcodeproj \
+            -scheme "$INPUT_SCHEME" \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build | xcbeautify --renderer github-actions

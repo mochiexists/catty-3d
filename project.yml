@@ -1,0 +1,237 @@
+# XcodeGen Configuration for Catty
+#
+# Usage:
+#   brew install xcodegen
+#   xcodegen generate
+#
+# Distribution Channels (mirroring Local AI Chat's Indoor/Outdoor split):
+#   - Outdoor (Direct Download): unsandboxed, distributed via DMG +
+#     Sparkle appcast + Homebrew cask, lives on catatui.com/catty.
+#   - Indoor (Mac App Store): sandboxed, StoreKit-aware (no StoreKit
+#     wiring today — there's nothing to sell yet, but the entitlements
+#     and build config are ready).
+#
+# Targets:
+#   - Catty: Outdoor build (default for development, Cmd+R in Xcode).
+#   - Catty (App Store): Indoor build (sandboxed).
+#   - iOS App Store target is deferred until Phase 3b of the extraction
+#     brief lands the iOS port of the package's RealityKit / SwiftTerm
+#     pieces. Until then, iOS Catty is SSH-only and shipped inside
+#     Local AI Chat, not as a standalone app.
+
+name: Catty
+
+options:
+  # Fallback prefix XcodeGen uses ONLY for targets that don't supply
+  # their own bundle ID. Every Catty target sets PRODUCT_BUNDLE_IDENTIFIER
+  # explicitly via `$(BUNDLE_ID_PREFIX).Catty…`, so this is vestigial —
+  # kept neutral (`com.example`) so the committed file doesn't leak a
+  # specific owner's namespace.
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    macOS: "15.2"
+  developmentLanguage: en
+  xcodeVersion: "26.2"
+  generateEmptyDirectories: true
+  groupSortPosition: bottom
+  createIntermediateGroups: true
+
+attributes:
+  LastUpgradeCheck: "2620"
+  LastUpgradeVersion: "2620"
+
+# Project-wide xcconfig override. `Local.xcconfig` is gitignored and
+# carries DEVELOPMENT_TEAM + BUNDLE_ID_PREFIX (see Local.example.xcconfig
+# for the template + setup steps). All targets inherit from it.
+configFiles:
+  Debug: Local.xcconfig
+  Release: Local.xcconfig
+
+settings:
+  base:
+    # DEVELOPMENT_TEAM + BUNDLE_ID_PREFIX come from Local.xcconfig. The
+    # explicit assignment here is intentional so xcodebuild errors out
+    # with a clear "Local.xcconfig missing" rather than producing an
+    # ad-hoc unsigned bundle.
+    DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    GENERATE_INFOPLIST_FILE: YES
+    DEAD_CODE_STRIPPING: YES
+    # SwiftLint runs as a build phase and needs filesystem access — disable
+    # script sandbox the same way Local AI Chat does.
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOL_EXTENSIONS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+  configs:
+    Debug:
+      DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+      SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+      MTL_ENABLE_DEBUG_INFO: "INCLUDE_SOURCE"
+      ENABLE_TESTABILITY: YES
+    Release:
+      DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+      SWIFT_OPTIMIZATION_LEVEL: "-O"
+      MTL_ENABLE_DEBUG_INFO: "NO"
+
+packages:
+  # The Catty SwiftPM package lives in THIS repo (Sources/Catty/* +
+  # Package.swift at the root). XcodeGen treats a `path: "."` package
+  # reference as "this directory holds a Package.swift" and consumes
+  # the `Catty` library product from it. The standalone Catty.app
+  # target then depends on that local product — same wiring you'd
+  # use for any vendored SPM package.
+  Catty:
+    path: "."
+
+# ============================================================================
+# Target Templates (DRY between Outdoor and Indoor)
+# ============================================================================
+targetTemplates:
+  # Sources shared by every Catty app target.
+  CattySources:
+    type: application
+    sources:
+      - path: App
+      - path: Assets.xcassets
+    dependencies:
+      - package: Catty
+        product: Catty
+
+  # Common Info.plist + assets + display-name settings.
+  CattyAppSettings:
+    settings:
+      base:
+        PRODUCT_NAME: Catty
+        # Swift module name decoupled from PRODUCT_NAME so the app
+        # module ("CattyApp") doesn't collide with the SwiftPM
+        # package's `Catty` module on swiftmodule output paths. The
+        # built bundle is still `Catty.app`.
+        PRODUCT_MODULE_NAME: CattyApp
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        INFOPLIST_KEY_CFBundleDisplayName: "Catty"
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Catty contributors. MIT licensed."
+        # Catty respects the system appearance.
+        INFOPLIST_KEY_NSRequiresAquaSystemAppearance: NO
+        # Stable bundle name (used in DMG path, Sparkle appcast title, etc.)
+        INFOPLIST_KEY_CFBundleName: "Catty"
+        ENABLE_PREVIEWS: YES
+      configs:
+        Debug:
+          # Dev variant ships with a separate bundle ID so it installs
+          # alongside the production app — same pattern used by other
+          # macOS apps that need to test permissions / install flows
+          # without overwriting the user's production copy.
+          PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).Catty.dev
+          ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Debug
+          INFOPLIST_KEY_CFBundleDisplayName: "Catty DEV"
+
+# ============================================================================
+# Targets
+# ============================================================================
+#
+# Module names (the target keys) are CattyApp / CattyAppStore so they
+# don't collide with the SwiftPM package's `Catty` module. PRODUCT_NAME
+# stays `Catty`, so the built bundle is still `Catty.app`.
+targets:
+  # ============================================================================
+  # MARK: - macOS Outdoor (Direct Download)
+  # ============================================================================
+  # Unsandboxed. Distributed via DMG + Sparkle appcast + Homebrew cask
+  # on `mochiexists/catatui-site` (CNAME catatui.com, Catty lives at
+  # /catty). Notarized through release-direct.yml when CI is wired.
+  CattyApp:
+    templates: [CattySources, CattyAppSettings]
+    supportedDestinations: [macOS]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).Catty
+        CODE_SIGN_ENTITLEMENTS: Entitlements/DirectDownload.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+    postCompileScripts:
+      - script: |
+          export PATH="/opt/homebrew/bin:$PATH"
+          if which swiftlint > /dev/null; then
+            swiftlint
+          else
+            echo "warning: SwiftLint not installed"
+          fi
+        name: SwiftLint
+        basedOnDependencyAnalysis: false
+
+  # ============================================================================
+  # MARK: - macOS Indoor (Mac App Store)
+  # ============================================================================
+  # Sandboxed. Distributed via the Mac App Store. Same source set as
+  # Outdoor — the difference is the entitlements file (sandboxed) and
+  # the bundle ID suffix.
+  CattyAppStore:
+    templates: [CattySources, CattyAppSettings]
+    supportedDestinations: [macOS]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).Catty.AppStore
+        CODE_SIGN_ENTITLEMENTS: Entitlements/AppStore.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        # Builds with this flag take the App Store-shaped behaviour.
+        # Today there's no Indoor/Outdoor branching in the Catty source
+        # — neither variant has paid features — but the flag is wired
+        # so when StoreKit shows up we can `#if APPSTORE_BUILD`.
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS:
+          - "$(inherited)"
+          - APPSTORE_BUILD
+    postCompileScripts:
+      - script: |
+          export PATH="/opt/homebrew/bin:$PATH"
+          if which swiftlint > /dev/null; then
+            swiftlint
+          else
+            echo "warning: SwiftLint not installed"
+          fi
+        name: SwiftLint
+        basedOnDependencyAnalysis: false
+
+  # ============================================================================
+  # MARK: - UI Tests (drive fastlane screenshots)
+  # ============================================================================
+  CattyUITests:
+    type: bundle.ui-testing
+    supportedDestinations: [macOS]
+    sources:
+      - path: UITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).Catty.UITests
+        TEST_TARGET_NAME: CattyApp
+    dependencies:
+      - target: CattyApp
+
+# Scheme names stay user-friendly ("Catty", "Catty (App Store)") even
+# though the underlying targets are CattyApp / CattyAppStore — schemes
+# are display labels, decoupled from target identifiers.
+schemes:
+  Catty:
+    build:
+      targets:
+        CattyApp: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - CattyUITests
+    archive:
+      config: Release
+
+  Catty (App Store):
+    build:
+      targets:
+        CattyAppStore: all
+    run:
+      config: Debug
+    archive:
+      config: Release

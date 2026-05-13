@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Indoor (Mac App Store) entitlements for Catty.
+
+  Sandboxed. `network.client` lets the SSH transport reach remote
+  hosts; that's all Catty needs. The local terminal `.local` mode
+  spawns a child process which the sandbox forbids, so on Indoor
+  builds we'd surface an "Available in Catty Outdoor" CTA — same
+  pattern Local AI Chat uses for its Outdoor-only features.
+
+  No file-access entitlements requested: the folder picker uses
+  the system file dialog, which grants a security-scoped URL the
+  app can read inside the sandbox.
+-->
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <key>com.apple.security.network.client</key>
+    <true/>
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+</dict>
+</plist>

@@ -1,0 +1,16 @@
+# Snapfile — defaults for `fastlane snapshot` / `capture_screenshots`.
+# Most settings come from the Fastfile lane; this file is here so the
+# `fastlane init` re-runs find it and Fastlane's snapshot CLI defaults
+# pick up the project + scheme without flags.
+
+scheme "Catty"
+output_directory "./fastlane/screenshots/macos"
+
+# Languages we capture for. English-only for now; community translations
+# can append entries here later without touching the Fastfile.
+languages([
+  "en-US"
+])
+
+clear_previous_screenshots true
+stop_after_first_error true

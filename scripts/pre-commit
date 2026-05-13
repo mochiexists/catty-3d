@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# Catty pre-commit hook
+# Fast checks: xcodegen sync + swiftlint on staged files.
+#
+# Environment variables:
+#   SKIP_XCODEGEN=1     – Skip XcodeGen project regeneration
+#   SKIP_LINT=1         – Skip SwiftLint check
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+PROJECT_PBXPROJ_PATH="$REPO_ROOT/Catty.xcodeproj/project.pbxproj"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}  Catty Pre-Commit Checks${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+FAILED=0
+
+# ----------------------------------------------------------------------------
+# 1. Regenerate Xcode project if project.yml changed
+# ----------------------------------------------------------------------------
+if [ "$SKIP_XCODEGEN" = "1" ]; then
+  echo -e "${YELLOW}⏭  Skipping XcodeGen (SKIP_XCODEGEN=1)${NC}"
+elif command -v xcodegen >/dev/null 2>&1; then
+  echo -e "\n${BLUE}▶ Regenerating Xcode project (XcodeGen)...${NC}"
+  (cd "$REPO_ROOT" && xcodegen generate >/dev/null) && \
+    echo -e "${GREEN}✓ Xcode project regenerated${NC}" || \
+    { echo -e "${RED}✗ XcodeGen failed${NC}"; FAILED=1; }
+  git add "$PROJECT_PBXPROJ_PATH" 2>/dev/null || true
+else
+  echo -e "${YELLOW}⚠  XcodeGen not installed (brew install xcodegen)${NC}"
+fi
+
+# ----------------------------------------------------------------------------
+# 2. SwiftLint
+# ----------------------------------------------------------------------------
+if [ "$SKIP_LINT" = "1" ]; then
+  echo -e "${YELLOW}⏭  Skipping SwiftLint (SKIP_LINT=1)${NC}"
+elif command -v swiftlint >/dev/null 2>&1; then
+  echo -e "\n${BLUE}▶ Running SwiftLint...${NC}"
+  LINT_OUTPUT=$(cd "$REPO_ROOT" && swiftlint lint --quiet 2>&1) || true
+  ERRORS=$(echo "$LINT_OUTPUT" | grep -c ": error:" || true)
+  if [ "$ERRORS" -gt 0 ]; then
+    echo -e "${RED}✗ SwiftLint found $ERRORS error(s):${NC}"
+    echo "$LINT_OUTPUT" | grep ": error:" | head -5
+    FAILED=1
+  else
+    echo -e "${GREEN}✓ SwiftLint passed${NC}"
+  fi
+else
+  echo -e "${YELLOW}⚠  SwiftLint not installed (brew install swiftlint)${NC}"
+fi
+
+# ----------------------------------------------------------------------------
+# Conventional commits reminder
+# ----------------------------------------------------------------------------
+echo -e "\n${BLUE}▶ Commit message reminder${NC}"
+echo -e "  Use conventional commits: feat: fix: refactor: docs: test: chore:"
+
+echo -e "\n${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+if [ "$FAILED" -eq 1 ]; then
+  echo -e "${RED}✗ Pre-commit checks failed${NC}"
+  echo -e "${YELLOW}  Tip: use 'git commit --no-verify' to bypass${NC}"
+  exit 1
+fi
+
+echo -e "${GREEN}✓ Pre-commit checks passed${NC}"
+exit 0

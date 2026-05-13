@@ -1,0 +1,45 @@
+# Catty Fastfile
+#
+# Minimal lane set for the standalone Catty app. Mirrors the conventions
+# in Local AI Chat's Fastfile (which is much larger because it owns
+# TestFlight, App Store upload, Direct Download notarization, etc.) but
+# starts small here — we'll grow it as Phase 5 (distribution pipeline)
+# lands.
+#
+# Lanes today:
+#   • fastlane generate_project — wraps `xcodegen generate`.
+#   • fastlane mac screenshots  — UI-test-driven screenshot capture.
+#
+# Add releases / notarization in Phase 5.
+
+fastlane_version "2.231.0"
+
+default_platform :mac
+
+# ============================================================================
+# Top-level lanes
+# ============================================================================
+
+desc "Regenerate the Xcode project from project.yml"
+lane :generate_project do
+  sh "cd .. && xcodegen generate"
+end
+
+# ============================================================================
+# macOS lanes
+# ============================================================================
+
+platform :mac do
+  desc "Capture macOS screenshots via UI tests"
+  lane :screenshots do
+    capture_screenshots(
+      scheme: "Catty",
+      output_directory: "./fastlane/screenshots/macos",
+      clear_previous_screenshots: true,
+      stop_after_first_error: true,
+      reinstall_app: false,
+      erase_simulator: false,
+      devices: nil  # macOS host; no simulator selection
+    )
+  end
+end
