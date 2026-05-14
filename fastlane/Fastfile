@@ -50,7 +50,7 @@ platform :mac do
   # --------------------------------------------------------------------------
   # Screenshots
   # --------------------------------------------------------------------------
-  desc "Capture macOS screenshots via UI tests"
+  desc "Capture macOS screenshots via UI tests (drives ScreenshotPresets)"
   lane :screenshots do
     capture_screenshots(
       scheme: "Catty",
@@ -59,7 +59,8 @@ platform :mac do
       stop_after_first_error: true,
       reinstall_app: false,
       erase_simulator: false,
-      devices: nil
+      devices: nil,
+      languages: ["en-US"]
     )
   end
 

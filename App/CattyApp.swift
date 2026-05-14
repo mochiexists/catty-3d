@@ -11,6 +11,13 @@ import SwiftUI
 
 @main
 struct CattyApp: App {
+    init() {
+        // Honour `--catty-preset=<name>` launch args from Fastlane /
+        // UI tests so the cold-start scene matches the screenshot
+        // composition. No-op when the arg isn't present.
+        ScreenshotPresetLauncher.applyFromLaunchArgs()
+    }
+
     var body: some Scene {
         WindowGroup("Catty") {
             RootView()
