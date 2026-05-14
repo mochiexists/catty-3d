@@ -1,0 +1,193 @@
+# release-direct.yml
+#
+# Tag-driven release pipeline for the Outdoor (Direct Download) channel
+# of Catty. Mirrors the structure used by Local AI Chat:
+#
+#   * Trigger: push of a tag matching `release/v*` (the `+N` suffix is
+#     parsed in shell because GitHub Actions tag globs reject `+`).
+#   * Validate the build number is strictly greater than the highest
+#     previous successful release.
+#   * Build + sign Outdoor target with Developer ID Application cert.
+#   * Notarize via notarytool (keychain credential profile pre-set on
+#     the runner).
+#   * Wrap in DMG.
+#   * Publish DMG as a GitHub Release on `mochiexists/catatui-site`.
+#   * Update Sparkle `appcast.xml` on the site repo.
+#   * Update Homebrew cask on `mochiexists/homebrew-tap`.
+#   * Auto-promote `outdoor-cat` -> `main` via a GitHub App token.
+#
+# Status: scaffolding. Build / sign / notarize steps are TODOs guarded
+# by secret existence; the workflow no-ops cleanly until secrets land.
+#
+# All untrusted-event inputs flow via env: rather than inline ${{ }}
+# in run: blocks (see the GitHub Actions injection guidance).
+
+name: Release (Direct Download)
+
+on:
+  push:
+    tags:
+      - "release/v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Marketing version (e.g. 0.1.0). Required for manual dispatch."
+        required: true
+      build_number:
+        description: "Monotonic build number (e.g. 1). Required for manual dispatch."
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  parse-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+      build_number: ${{ steps.parse.outputs.build_number }}
+    steps:
+      - id: parse
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_BUILD: ${{ inputs.build_number }}
+        run: |
+          set -euo pipefail
+          if [[ "$REF_NAME" =~ ^release/v([0-9]+\.[0-9]+\.[0-9]+)\+([0-9]+)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            BUILD="${BASH_REMATCH[2]}"
+          elif [[ -n "$INPUT_VERSION" && -n "$INPUT_BUILD" ]]; then
+            VERSION="$INPUT_VERSION"
+            BUILD="$INPUT_BUILD"
+          else
+            echo "Tag must match 'release/vX.Y.Z+N' or version+build inputs must be supplied." >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD" >> "$GITHUB_OUTPUT"
+          echo "Parsed: version=$VERSION build=$BUILD"
+
+  validate-monotonic-build:
+    runs-on: ubuntu-latest
+    needs: parse-tag
+    steps:
+      - name: Verify build number strictly increases
+        env:
+          NEW_BUILD: ${{ needs.parse-tag.outputs.build_number }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          LAST=$(gh release list -R "$GH_REPO" --json tagName -L 50 --jq '
+            [.[] | .tagName | capture("\\+(?<n>\\d+)$") | .n | tonumber] | max // 0
+          ')
+          echo "Last build number on releases: $LAST"
+          echo "This build number:            $NEW_BUILD"
+          if [[ "$NEW_BUILD" -le "$LAST" ]]; then
+            echo "::error::Build number $NEW_BUILD is not strictly greater than $LAST."
+            exit 1
+          fi
+
+  build-sign-notarize-publish:
+    runs-on: macos-26
+    needs: [parse-tag, validate-monotonic-build]
+    steps:
+      - name: Check secrets are present
+        env:
+          HAVE_CERT: ${{ secrets.APPLE_CERTIFICATE_BASE64 != '' }}
+          HAVE_NOTARY: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD != '' }}
+          HAVE_LOCAL: ${{ secrets.LOCAL_XCCONFIG_BASE64 != '' }}
+        run: |
+          if [[ "$HAVE_CERT" != "true" || "$HAVE_NOTARY" != "true" || "$HAVE_LOCAL" != "true" ]]; then
+            echo "::warning::One or more release secrets missing. Configure APPLE_CERTIFICATE_BASE64, APPLE_APP_SPECIFIC_PASSWORD, LOCAL_XCCONFIG_BASE64 to enable real releases."
+            exit 0
+          fi
+          echo "All required secrets present; proceeding with build."
+
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Materialize Local.xcconfig from secret
+        if: ${{ secrets.LOCAL_XCCONFIG_BASE64 != '' }}
+        env:
+          LOCAL_XCCONFIG_BASE64: ${{ secrets.LOCAL_XCCONFIG_BASE64 }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$LOCAL_XCCONFIG_BASE64" | base64 --decode > Local.xcconfig
+          chmod 600 Local.xcconfig
+
+      - name: Install build deps
+        run: brew install xcodegen create-dmg
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Set marketing + project version from parsed tag
+        env:
+          NEW_VERSION: ${{ needs.parse-tag.outputs.version }}
+          NEW_BUILD: ${{ needs.parse-tag.outputs.build_number }}
+        run: |
+          set -euo pipefail
+          /usr/bin/sed -i '' \
+            -e "s/MARKETING_VERSION: .*/MARKETING_VERSION: \"$NEW_VERSION\"/" \
+            -e "s/CURRENT_PROJECT_VERSION: .*/CURRENT_PROJECT_VERSION: \"$NEW_BUILD\"/" \
+            project.yml
+          xcodegen generate
+
+      - name: TODO sign + archive Outdoor build
+        run: echo "::notice::Outdoor sign + archive step not yet implemented. See docs/RELEASE.md."
+
+      - name: TODO notarize via notarytool
+        run: echo "::notice::Notarization step not yet implemented."
+
+      - name: TODO wrap in DMG via create-dmg
+        run: echo "::notice::DMG packaging step not yet implemented."
+
+      - name: TODO publish DMG to mochiexists/catatui-site GH Release
+        run: echo "::notice::Site-repo publish step not yet implemented."
+
+      - name: TODO update Sparkle appcast.xml
+        run: echo "::notice::Sparkle appcast update not yet implemented."
+
+      - name: TODO update Homebrew cask
+        run: echo "::notice::Homebrew cask update not yet implemented."
+
+  auto-promote-to-main:
+    runs-on: ubuntu-latest
+    needs: build-sign-notarize-publish
+    if: ${{ success() }}
+    steps:
+      - name: Skip if APP_ID secret missing
+        env:
+          HAVE_APP: ${{ secrets.APP_ID != '' }}
+        run: |
+          if [[ "$HAVE_APP" != "true" ]]; then
+            echo "::warning::APP_ID secret not set, skipping auto-promote to main."
+            exit 0
+          fi
+
+      - name: Mint GitHub App installation token
+        if: ${{ secrets.APP_ID != '' }}
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Fast-forward main from outdoor-cat
+        if: ${{ steps.app-token.outputs.token != '' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          OUTDOOR_SHA=$(gh api "repos/$GH_REPO/branches/outdoor-cat" --jq '.commit.sha')
+          echo "outdoor-cat: $OUTDOOR_SHA"
+          gh api "repos/$GH_REPO/git/refs/heads/main" -X PATCH \
+            -f "sha=$OUTDOOR_SHA" -F "force=false" || {
+              echo "::error::Fast-forward refused: main has commits not in outdoor-cat."
+              exit 1
+            }
+          echo "main fast-forwarded to $OUTDOOR_SHA"
