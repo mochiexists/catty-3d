@@ -38,6 +38,22 @@
 # OR via gh:
 #
 #   gh workflow run release-direct.yml -f version=0.1.0 -f build_number=1
+#
+# OSS-safety properties (Catty is a public repo):
+#
+#   * Triggers ONLY on `push: tags: release/v*+*` and `workflow_dispatch`.
+#     Both require write access to the repo, so PR contributors from forks
+#     cannot fire this workflow OR see any of the secrets it reads.
+#   * Never uses `pull_request_target` or any trigger that runs untrusted
+#     PR code with secret access.
+#   * `permissions: contents: read` is the minimum scope; `actions: read`
+#     is for cross-step run-list lookups only.
+#   * All workflow_dispatch inputs flow through `env:` rather than inline
+#     `${{ }}` expansion in `run:` blocks, so a malicious version string
+#     can't escape into the shell.
+#   * Repo settings should also enforce: Settings → Actions → General →
+#     "Fork pull request workflows from outside collaborators" → "Require
+#     approval for first-time contributors" (the default; verify it).
 
 name: Release (Direct Download)
 
