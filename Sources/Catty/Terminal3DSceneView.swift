@@ -198,6 +198,13 @@ public struct Terminal3DSceneView: View {
     /// directional spawn arrows are visible around the centre pane.
     @State private var addTerminalsMode: Bool = false
 
+    /// Hidden "compose for icon" mode: hides every UI chrome element
+    /// except the compose toggle, freezes Maxwell + rat orbit, and
+    /// freezes the cursor cats. Lets the user pull the camera into a
+    /// clean frame and take a window screenshot (⌘⇧4 → spacebar →
+    /// click the Catty window) to use as the 1024×1024 icon source.
+    @State private var iconComposeMode: Bool = false
+
     /// AppKit local-event monitor token for scroll-wheel zoom. Owned
     /// by `body`'s onAppear / onDisappear lifecycle. Installed at the
     /// app level (rather than as an in-tree NSView) so scroll always
@@ -398,29 +405,38 @@ public struct Terminal3DSceneView: View {
             // chrome (close button / status banner / right rail /
             // spawn arrows) so those views consume clicks first; only
             // taps that miss the chrome fall through to focus a pane.
-            if panes.count > 1 {
+            if panes.count > 1 && !iconComposeMode {
                 paneFocusOverlay
             }
-            // Top-left close button — dismisses the sheet. Hidden when
-            // the host opts out (standalone Catty.app, where the window
-            // owns navigation).
-            if showsCloseButton {
-                closeButton
+            // Compose mode tucks every other chrome layer away so
+            // the user can take a clean window screenshot for the
+            // app icon. The compose toggle itself stays visible
+            // (top-right, dimmed) so they can flip back out.
+            if !iconComposeMode {
+                // Top-left close button — dismisses the sheet. Hidden when
+                // the host opts out (standalone Catty.app, where the window
+                // owns navigation).
+                if showsCloseButton {
+                    closeButton
+                }
+                // SSH connection status — shown in the centre when waiting
+                // for handshake / on failure. Hidden once a connection is
+                // live (the live texture takes over).
+                sshStatusBanner
+                // Right-side controls: bare rat button at home view, full
+                // panel once any user adjustment has been made. The panel
+                // grows progressively (settings/orbit/flat) after rat press.
+                controls
+                if hasUserAdjustments {
+                    controlHint
+                }
+                if hasRatBeenPressed && showDebugPanel {
+                    debugMinimap
+                }
             }
-            // SSH connection status — shown in the centre when waiting
-            // for handshake / on failure. Hidden once a connection is
-            // live (the live texture takes over).
-            sshStatusBanner
-            // Right-side controls: bare rat button at home view, full
-            // panel once any user adjustment has been made. The panel
-            // grows progressively (settings/orbit/flat) after rat press.
-            controls
-            if hasUserAdjustments {
-                controlHint
-            }
-            if hasRatBeenPressed && showDebugPanel {
-                debugMinimap
-            }
+            // Compose-mode toggle. Always visible but dimmed when in
+            // compose mode so the user has a way back out.
+            composeToggle
 
             // Spawn arrows. Rendered as a SwiftUI overlay at fixed
             // screen offsets from the centre — the cardinal slots in
@@ -430,7 +446,7 @@ public struct Terminal3DSceneView: View {
             // the user orbits the camera, the arrows stay
             // screen-aligned; we may refine this to project the world
             // positions if it feels off.
-            if addTerminalsMode {
+            if addTerminalsMode && !iconComposeMode {
                 spawnArrowsOverlay
                     .transition(.opacity)
             }
@@ -523,6 +539,41 @@ public struct Terminal3DSceneView: View {
         if let monitor = scrollMonitor {
             NSEvent.removeMonitor(monitor)
             scrollMonitor = nil
+        }
+    }
+
+    /// Top-right compose-mode toggle. Always-on viewfinder icon
+    /// that toggles `iconComposeMode`. In compose mode every other
+    /// chrome layer hides, the orbit freezes, and the user can take
+    /// a clean window screenshot for the app icon source.
+    private var composeToggle: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        iconComposeMode.toggle()
+                    }
+                } label: {
+                    Image(systemName: iconComposeMode
+                          ? "viewfinder.circle.fill"
+                          : "viewfinder")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 28, height: 28)
+                        .background(.black.opacity(iconComposeMode ? 0.25 : 0.55), in: Circle())
+                        .overlay(Circle().stroke(.white.opacity(0.18), lineWidth: 1))
+                        .opacity(iconComposeMode ? 0.4 : 1)
+                }
+                .buttonStyle(.plain)
+                .help(iconComposeMode
+                      ? "Exit compose mode (⌘⇧I)"
+                      : "Compose for icon — hides UI + freezes the orbit")
+                .keyboardShortcut("i", modifiers: [.command, .shift])
+                .padding(.trailing, 16)
+                .padding(.top, 10)
+            }
+            Spacer()
         }
     }
 
@@ -785,7 +836,8 @@ public struct Terminal3DSceneView: View {
                 panOffset: panOffset,
                 cameraMode: cameraMode,
                 surfaceModes: surfaceModes,
-                activeSlot: activeSlot
+                activeSlot: iconComposeMode ? nil : activeSlot,
+                freezeOrbiters: iconComposeMode
             )
         }
         .ignoresSafeArea()

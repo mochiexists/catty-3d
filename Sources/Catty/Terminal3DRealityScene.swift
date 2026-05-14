@@ -63,6 +63,12 @@ public struct Terminal3DRealityScene: View {
     /// behind that pane's plane. `nil` hides every glow.
     public let activeSlot: PaneSlot?
 
+    /// When true, Maxwell + rat orbit motion + cursor-cat bob/spin
+    /// all freeze. Used by `iconComposeMode` in the host scene view
+    /// so the user can stage a clean frame for the app icon
+    /// screenshot.
+    public let freezeOrbiters: Bool
+
     /// Legacy single-mode accessor for code paths still expecting
     /// one canonical surface (the cursor-cat positioning uses this
     /// for centre-pane bobbing). Returns the centre's mode.
@@ -79,7 +85,8 @@ public struct Terminal3DRealityScene: View {
         panOffset: SIMD3<Float>,
         cameraMode: CameraMode,
         surfaceModes: [PaneSlot: TerminalSurfaceMode],
-        activeSlot: PaneSlot? = nil
+        activeSlot: PaneSlot? = nil,
+        freezeOrbiters: Bool = false
     ) {
         self.panes = panes
         self.config = config
@@ -90,6 +97,7 @@ public struct Terminal3DRealityScene: View {
         self.cameraMode = cameraMode
         self.surfaceModes = surfaceModes
         self.activeSlot = activeSlot
+        self.freezeOrbiters = freezeOrbiters
     }
 
     @State private var orbiters = OrbitState()
@@ -133,12 +141,16 @@ public struct Terminal3DRealityScene: View {
                 buildScene(into: &content)
             } update: { content in
                 ensurePaneEntities(into: &content)
-                orbiters.tick(elapsed: elapsed, config: config)
+                if !freezeOrbiters {
+                    orbiters.tick(elapsed: elapsed, config: config)
+                }
                 syncPaneVisibility()
                 applyTerminalTexture()
                 applyCameraZoom()
                 applySurfaceMode()
-                updateCursorCat(elapsed: elapsed)
+                if !freezeOrbiters {
+                    updateCursorCat(elapsed: elapsed)
+                }
             }
         }
     }
