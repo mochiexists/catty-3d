@@ -50,18 +50,49 @@ platform :mac do
   # --------------------------------------------------------------------------
   # Screenshots
   # --------------------------------------------------------------------------
-  desc "Capture macOS screenshots via UI tests (drives ScreenshotPresets)"
+  desc "Capture macOS screenshots via UI tests (Mochi Records-style)"
   lane :screenshots do
-    capture_screenshots(
+    # Pattern lifted from MochiRecords/MacScreenshotTests. The UI test
+    # runner is sandboxed and TCC-blocked from writing into
+    # ~/Documents, so the test writes PNGs to
+    # ~/Library/Caches/tools.fastlane/screenshots-macos — accessible
+    # from inside the sandbox. The sandbox may further redirect that
+    # into the runner's container, so we check both locations after
+    # the test pass and move whatever lands into fastlane/screenshots.
+    require "fileutils"
+
+    final_dir = File.expand_path("../fastlane/screenshots/macos/en-US", __dir__)
+    FileUtils.rm_rf(final_dir)
+    FileUtils.mkdir_p(final_dir)
+
+    cache_dirs = [
+      File.expand_path("~/Library/Caches/tools.fastlane/screenshots-macos"),
+      File.expand_path("~/Library/Containers/mochiexists.Catty.UITests.xctrunner/Data/Library/Caches/tools.fastlane/screenshots-macos")
+    ]
+    cache_dirs.each { |d| FileUtils.rm_rf(d) }
+
+    run_tests(
+      project: "Catty.xcodeproj",
       scheme: "Catty",
-      output_directory: "./fastlane/screenshots/macos",
-      clear_previous_screenshots: true,
-      stop_after_first_error: true,
-      reinstall_app: false,
-      erase_simulator: false,
-      devices: nil,
-      languages: ["en-US"]
+      destination: "platform=macOS",
+      only_testing: ["CattyUITests"],
+      output_directory: "./fastlane/test_output",
+      skip_package_dependencies_resolution: false
     )
+
+    moved = 0
+    cache_dirs.each do |dir|
+      next unless File.directory?(dir)
+      Dir.glob(File.join(dir, "*.png")).each do |src|
+        dest = File.join(final_dir, File.basename(src))
+        FileUtils.mv(src, dest)
+        moved += 1
+      end
+    end
+    UI.success("captured #{moved} screenshot(s) → #{final_dir}")
+    Dir.glob(File.join(final_dir, "*.png")).sort.each do |p|
+      UI.message("  #{File.basename(p)} (#{File.size(p)} bytes)")
+    end
   end
 
   # --------------------------------------------------------------------------
@@ -109,6 +140,7 @@ platform :mac do
     api_key = asc_api_key_or_nil
     deliver(
       api_key: api_key,
+      app_identifier: catty_app_identifier,
       skip_binary_upload: true,
       skip_screenshots: true,
       force: true
@@ -120,6 +152,7 @@ platform :mac do
     api_key = asc_api_key_or_nil
     deliver(
       api_key: api_key,
+      app_identifier: catty_app_identifier,
       skip_binary_upload: true,
       skip_metadata: true,
       force: true
@@ -194,4 +227,13 @@ end
 
 def built_pkg_path
   File.expand_path("../fastlane/build/macos/Catty.pkg", __dir__)
+end
+
+# Bundle identifier for the App Store target. Single source of truth so
+# `deliver`/`pilot` calls don't fall back to interactive username lookup
+# when the API key alone isn't enough to disambiguate the app. Override
+# via CATTY_APP_IDENTIFIER if you're working from a fork with a
+# different prefix.
+def catty_app_identifier
+  ENV["CATTY_APP_IDENTIFIER"] || "mochiexists.Catty"
 end

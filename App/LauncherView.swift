@@ -41,10 +41,9 @@ struct LauncherView: View {
         case openSSH(CattySSHContext)
     }
 
-    /// Where to send Indoor users who need a local terminal. Final
-    /// link lands when the Outdoor DMG goes live on the site.
-    /// Placeholder for now.
-    private let outdoorDownloadURL = URL(string: "https://catatui.com/catty")!
+    /// Where to send Indoor users who need a local terminal. The
+    /// /download page handles arch detection + brew tap snippet.
+    private let outdoorDownloadURL = URL(string: "https://catty3d.com/download")!
 
     /// Shared card dimensions so the two cards line up regardless of
     /// internal content. Tweak together if the layout needs more or
@@ -91,10 +90,10 @@ struct LauncherView: View {
 
     private var header: some View {
         VStack(spacing: 8) {
-            Text("Catty")
+            Text("Catty 3D")
                 .font(.system(size: 44, weight: .semibold, design: .rounded))
                 .foregroundStyle(.primary)
-            Text("A 3D terminal experience.")
+            Text("A terminal that lives in 3D space.")
                 .font(.title3)
                 .foregroundStyle(.secondary)
         }

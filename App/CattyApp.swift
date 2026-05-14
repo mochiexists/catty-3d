@@ -19,7 +19,7 @@ struct CattyApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("Catty") {
+        WindowGroup("Catty 3D") {
             RootView()
                 .frame(minWidth: 800, minHeight: 560)
         }

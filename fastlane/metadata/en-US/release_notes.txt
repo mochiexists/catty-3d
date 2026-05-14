@@ -1,4 +1,4 @@
-First public release of Catty.
+First public release of Catty 3D.
 
 • 3D terminal scene with Maxwell the cat and a rat orbiting your prompt
 • Grid-coord multi-pane layout — spawn terminals in any cardinal direction from any existing pane, no fixed limit

@@ -6,7 +6,7 @@
 #
 # Distribution Channels (mirroring Local AI Chat's Indoor/Outdoor split):
 #   - Outdoor (Direct Download): unsandboxed, distributed via DMG +
-#     Sparkle appcast + Homebrew cask, lives on catatui.com/catty.
+#     Sparkle appcast + Homebrew cask, lives on catty3d.com.
 #   - Indoor (Mac App Store): sandboxed, StoreKit-aware (no StoreKit
 #     wiring today — there's nothing to sell yet, but the entitlements
 #     and build config are ready).
@@ -104,21 +104,23 @@ targetTemplates:
   CattyAppSettings:
     settings:
       base:
-        PRODUCT_NAME: Catty
-        # Swift module name decoupled from PRODUCT_NAME so the app
-        # module ("CattyApp") doesn't collide with the SwiftPM
-        # package's `Catty` module on swiftmodule output paths. The
-        # built bundle is still `Catty.app`.
-        PRODUCT_MODULE_NAME: CattyApp
+        # PRODUCT_NAME tracks the target name so the built bundle
+        # filename matches what Xcode's UI test runner expects when
+        # looking up the host app via TEST_TARGET_NAME. Without this
+        # the runner can't find the .app and tests bail. The
+        # user-visible app name comes from CFBundleDisplayName
+        # ("Catty 3D"), not PRODUCT_NAME, so the on-disk filename
+        # change is invisible to end users.
+        PRODUCT_NAME: $(TARGET_NAME)
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
-        INFOPLIST_KEY_CFBundleDisplayName: "Catty"
-        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Catty contributors. MIT licensed."
-        # Catty respects the system appearance.
+        INFOPLIST_KEY_CFBundleDisplayName: "Catty 3D"
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Catty 3D contributors. MIT licensed."
+        # Catty 3D respects the system appearance.
         INFOPLIST_KEY_NSRequiresAquaSystemAppearance: NO
         # Stable bundle name (used in DMG path, Sparkle appcast title, etc.)
-        INFOPLIST_KEY_CFBundleName: "Catty"
+        INFOPLIST_KEY_CFBundleName: "Catty 3D"
         ENABLE_PREVIEWS: YES
       configs:
         Debug:
@@ -128,7 +130,7 @@ targetTemplates:
           # without overwriting the user's production copy.
           PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).Catty.dev
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon-Debug
-          INFOPLIST_KEY_CFBundleDisplayName: "Catty DEV"
+          INFOPLIST_KEY_CFBundleDisplayName: "Catty 3D DEV"
 
 # ============================================================================
 # Targets
@@ -142,8 +144,9 @@ targets:
   # MARK: - macOS Outdoor (Direct Download)
   # ============================================================================
   # Unsandboxed. Distributed via DMG + Sparkle appcast + Homebrew cask
-  # on `mochiexists/catatui-site` (CNAME catatui.com, Catty lives at
-  # /catty). Notarized through release-direct.yml when CI is wired.
+  # on `mochiexists/catty3d-site` (CNAME catty3d.com). Brew tap lives
+  # at `mochiexists/homebrew-catty3d`. Notarized through
+  # release-direct.yml when CI is wired.
   CattyApp:
     templates: [CattySources, CattyAppSettings]
     supportedDestinations: [macOS]
@@ -167,14 +170,16 @@ targets:
   # MARK: - macOS Indoor (Mac App Store)
   # ============================================================================
   # Sandboxed. Distributed via the Mac App Store. Same source set as
-  # Outdoor — the difference is the entitlements file (sandboxed) and
-  # the bundle ID suffix.
+  # Outdoor — the only difference is the entitlements file (sandbox on
+  # for App Store, off for Outdoor). Both targets share the same bundle
+  # ID so future iCloud / CloudKit containers are shared across the
+  # two distribution channels, matching the Local AI Chat pattern.
   CattyAppStore:
     templates: [CattySources, CattyAppSettings]
     supportedDestinations: [macOS]
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).Catty.AppStore
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).Catty
         CODE_SIGN_ENTITLEMENTS: Entitlements/AppStore.entitlements
         ENABLE_HARDENED_RUNTIME: YES
         # Builds with this flag take the App Store-shaped behaviour.

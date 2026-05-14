@@ -8,12 +8,16 @@ Catty ships through two channels, mirroring Local AI Cat's split:
 
 | Channel | Sandbox | Distribution | Bundle ID |
 |---|---|---|---|
-| **Indoor** (Mac App Store) | Yes | App Store / TestFlight | `mochiexists.Catty.AppStore` |
+| **Indoor** (Mac App Store) | Yes | App Store / TestFlight | `mochiexists.Catty` |
 | **Outdoor** (Direct Download) | No | Notarized DMG + Sparkle appcast + Homebrew cask | `mochiexists.Catty` |
 
-Both channels build from the same Catty codebase. The split lives in
-`project.yml` (two targets) and a single `APPSTORE_BUILD` Swift flag
-that gates Outdoor-only features (e.g. local-shell `.local` mode).
+Both channels build from the same Catty codebase and share a bundle
+identifier so future iCloud / CloudKit containers cover both
+distribution channels (the Local AI Chat pattern). Only one copy of
+the app can be installed on a user's Mac at a time — LaunchServices
+indexes by bundle ID. The split between the two targets lives in
+`project.yml` and the entitlements files (`AppStore.entitlements`
+vs `DirectDownload.entitlements`).
 
 ---
 
@@ -25,8 +29,7 @@ Set these up once in App Store Connect / Apple Developer Center:
 
 | Bundle ID | Capabilities | Channel |
 |---|---|---|
-| `mochiexists.Catty` | App Sandbox: off; Hardened Runtime; no extra entitlements | Outdoor (Developer ID) |
-| `mochiexists.Catty.AppStore` | App Sandbox: on; `network.client`; `files.user-selected.read-write` | Indoor (Mac App Store) |
+| `mochiexists.Catty` | Outdoor: Hardened Runtime, no sandbox. Indoor: App Sandbox on, `network.client`, `files.user-selected.read-write`. Same bundle ID — entitlements differ per target. | Outdoor (Developer ID) + Indoor (Mac App Store) |
 | `mochiexists.Catty.dev` | Same as Outdoor | Debug-variant tagged builds |
 | `mochiexists.Catty.UITests` | Test bundle | UI tests for fastlane snapshot |
 
@@ -130,9 +133,11 @@ issue/task #29) will:
 2. Build + sign the Outdoor target.
 3. Notarize via notarytool.
 4. Wrap in a DMG.
-5. Push to `mochiexists/catatui-site` GH Releases (DMG download host).
-6. Update Sparkle `appcast.xml` on the same site repo.
-7. Update Homebrew cask in `mochiexists/homebrew-tap`.
+5. Publish DMG as a GitHub Release on `mochiexists/catty-3d`
+   (the site's /download page links to `/releases/latest`).
+6. Update Sparkle `appcast.xml` on `mochiexists/catty3d-site` (served
+   at `catty3d.com/appcast.xml`).
+7. Update Homebrew cask in `mochiexists/homebrew-catty3d`.
 8. Auto-promote `outdoor-cat` → `main` so the Indoor pipeline (Xcode
    Cloud) picks up the same SHA on next push.
 

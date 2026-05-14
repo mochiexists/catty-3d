@@ -1,4 +1,4 @@
-Catty is a terminal that lives in 3D space. Your shell renders as a textured surface inside a RealityKit scene, with a tiny cat watching the cursor and a rat orbiting nearby — your familiar prompt, suddenly inhabiting a small universe of its own.
+Catty 3D is a terminal that lives in 3D space. Your shell renders as a textured surface inside a RealityKit scene, with a tiny cat watching the cursor and a rat orbiting nearby — your familiar prompt, suddenly inhabiting a small universe of its own.
 
 Open as many panes as you like. Spawn them in any cardinal direction from any existing terminal — left, right, up, down. The layout grows organically into an infinite grid, each pane with its own shell, its own cursor cat, its own surface mode.
 
@@ -13,6 +13,6 @@ What's inside:
 • Comical zoom range — pull the camera back until the whole cluster is a postage stamp against the starfield
 • Open source under the MIT license
 
-Catty is built on top of SwiftTerm and Citadel, with 3D assets gratefully borrowed from Orhun's Ratty (the rat) and bean's Maxwell-the-cat USDZ on Sketchfab (the cat). Full attribution lives inside the app and on GitHub.
+Catty 3D is built on top of SwiftTerm and Citadel, with 3D assets gratefully borrowed from Orhun's Ratty (the rat) and bean's Maxwell-the-cat USDZ on Sketchfab (the cat). Full attribution lives inside the app and on GitHub.
 
 This is the first public release. Feedback and contributions welcome at github.com/mochiexists/catty.

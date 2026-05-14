@@ -20,3 +20,8 @@ fastlane/screenshots/macos/*.png
 # Local signing + identifier overrides. Each contributor maintains
 # their own copy from `Local.example.xcconfig`. NEVER commit.
 Local.xcconfig
+
+# App Store Connect API keys (.p8). Local-only, never commit — anyone
+# with the file can authenticate to ASC as the issuing account.
+fastlane/*.p8
+fastlane/AuthKey_*.p8
