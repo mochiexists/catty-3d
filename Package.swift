@@ -29,6 +29,7 @@ import PackageDescription
 
 let package = Package(
     name: "Catty",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v15),
         .iOS(.v18)

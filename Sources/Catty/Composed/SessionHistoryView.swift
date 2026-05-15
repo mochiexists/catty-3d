@@ -43,9 +43,10 @@ public struct CattySessionHistoryView<Store: CattySessionStore>: View {
         VStack(spacing: 12) {
             Text("📜")
                 .font(.system(size: 48))
-            Text("Session history coming soon")
+            Text("Session history coming soon", bundle: .module)
                 .font(.title3)
-            Text("Tracking issue: see catty repo / docs/planning/catty-extraction-brief.md §6")
+            // Dev-only debug pointer; intentionally not localized.
+            Text(verbatim: "Tracking issue: see catty repo / docs/planning/catty-extraction-brief.md §6")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

@@ -1,0 +1,690 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "Catty 3D" : {
+      "comment" : "Product name. Don't translate — this is the App Store name.",
+      "shouldTranslate" : false,
+      "extractionState" : "manual"
+    },
+    "Maxwell" : {
+      "comment" : "Cat character name (internet meme reference). Don't translate.",
+      "shouldTranslate" : false,
+      "extractionState" : "manual"
+    },
+    "Ratty" : {
+      "comment" : "Inspirational tool name (homage). Don't translate.",
+      "shouldTranslate" : false,
+      "extractionState" : "manual"
+    },
+    "SSH" : {
+      "comment" : "Protocol acronym. Don't translate.",
+      "shouldTranslate" : false,
+      "extractionState" : "manual"
+    },
+    "No sessions yet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch keine Sitzungen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Aún no hay sesiones" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Aún no hay sesiones" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucune session pour l'instant" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nessuna sessione ancora" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "セッションはまだありません" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Nog geen sessies" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Nenhuma sessão ainda" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Ainda não há sessões" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "还没有会话" } }
+      }
+    },
+    "Open a local terminal or connect via SSH to get started." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Öffne ein lokales Terminal oder verbinde dich per SSH, um loszulegen." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Abre una terminal local o conéctate por SSH para empezar." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Abre un terminal local o conéctate por SSH para empezar." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrez un terminal local ou connectez-vous en SSH pour commencer." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Apri un terminale locale o connettiti via SSH per iniziare." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ローカルターミナルを開くか、SSH で接続して始めましょう。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Open een lokale terminal of maak verbinding via SSH om te beginnen." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Abra um terminal local ou conecte via SSH para começar." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Abre um terminal local ou liga-te via SSH para começar." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开本地终端或通过 SSH 连接以开始。" } }
+      }
+    },
+    "Layout %@ not yet implemented — showing active session only" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Layout %@ noch nicht implementiert — nur aktive Sitzung wird angezeigt" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "El diseño %@ aún no está implementado — mostrando solo la sesión activa" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "El diseño %@ aún no está implementado — mostrando solo la sesión activa" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Disposition %@ pas encore implémentée — affichage de la session active uniquement" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Layout %@ non ancora implementato — visualizzo solo la sessione attiva" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レイアウト %@ は未実装です — アクティブなセッションのみ表示します" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Lay-out %@ nog niet geïmplementeerd — alleen actieve sessie wordt getoond" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O layout %@ ainda não está implementado — mostrando apenas a sessão ativa" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "O esquema %@ ainda não está implementado — a mostrar apenas a sessão ativa" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "布局 %@ 尚未实现——仅显示当前会话" } }
+      }
+    },
+    "Session history coming soon" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sitzungsverlauf folgt in Kürze" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Historial de sesiones próximamente" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Historial de sesiones próximamente" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Historique des sessions bientôt disponible" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Cronologia sessioni in arrivo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "セッション履歴は近日公開" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Sessiegeschiedenis binnenkort beschikbaar" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Histórico de sessões em breve" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Histórico de sessões em breve" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "会话历史即将推出" } }
+      }
+    },
+    "Inspired by Ratty" : {
+      "comment" : "Attribution preamble. \"Ratty\" stays English (DNT).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Inspiriert von Ratty" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Inspirado en Ratty" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Inspirado en Ratty" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Inspiré par Ratty" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ispirato a Ratty" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Ratty にインスパイア" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Geïnspireerd door Ratty" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Inspirado em Ratty" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Inspirado em Ratty" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "灵感来自 Ratty" } }
+      }
+    },
+    "The terminal-in-a-3D-scene idea behind Catty 3D comes from Ratty by Orhun Parmaksız — a GPU-rendered terminal with inline 3D graphics. Their rat chases pixels in a terminal; our cat watches it happen from RealityKit." : {
+      "comment" : "Long marketing/attribution copy. \"Catty 3D\", \"Ratty\", \"Orhun Parmaksız\", and \"RealityKit\" are DNT.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Idee, ein Terminal in eine 3D-Szene zu setzen, hinter Catty 3D stammt von Ratty von Orhun Parmaksız — ein GPU-gerendertes Terminal mit eingebetteten 3D-Grafiken. Ihre Ratte jagt Pixel in einem Terminal; unsere Katze schaut von RealityKit aus zu." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "La idea de la terminal dentro de una escena 3D que hay detrás de Catty 3D viene de Ratty, de Orhun Parmaksız: una terminal renderizada por GPU con gráficos 3D integrados. Su rata persigue píxeles en una terminal; nuestro gato lo contempla desde RealityKit." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "La idea del terminal dentro de una escena 3D que hay detrás de Catty 3D viene de Ratty, de Orhun Parmaksız: un terminal renderizado por GPU con gráficos 3D integrados. Su rata persigue píxeles en un terminal; nuestro gato lo contempla desde RealityKit." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "L'idée d'un terminal dans une scène 3D derrière Catty 3D vient de Ratty d'Orhun Parmaksız — un terminal rendu par GPU avec des graphismes 3D intégrés. Leur rat poursuit des pixels dans un terminal ; notre chat observe la scène depuis RealityKit." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "L'idea di un terminale dentro una scena 3D dietro Catty 3D viene da Ratty di Orhun Parmaksız — un terminale renderizzato dalla GPU con grafica 3D integrata. Il loro topo insegue pixel in un terminale; il nostro gatto guarda la scena da RealityKit." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Catty 3D の「3D シーンの中の端末」というアイデアは、Orhun Parmaksız 氏の Ratty に由来します — GPU レンダリングで 3D グラフィックスをインライン表示する端末です。彼らのネズミが端末内でピクセルを追いかけ、私たちの猫が RealityKit からその様子を眺めています。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Het idee van een terminal in een 3D-scène achter Catty 3D komt van Ratty van Orhun Parmaksız — een GPU-gerenderde terminal met ingebouwde 3D-graphics. Hun rat jaagt op pixels in een terminal; onze kat kijkt toe vanuit RealityKit." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "A ideia de um terminal dentro de uma cena 3D por trás do Catty 3D vem do Ratty, de Orhun Parmaksız — um terminal renderizado por GPU com gráficos 3D integrados. O rato deles persegue pixels num terminal; nosso gato observa tudo a partir do RealityKit." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "A ideia de um terminal dentro de uma cena 3D por trás de Catty 3D vem de Ratty, de Orhun Parmaksız — um terminal renderizado por GPU com gráficos 3D integrados. O rato deles persegue píxeis num terminal; o nosso gato observa tudo a partir do RealityKit." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Catty 3D 中“将终端置入 3D 场景”的灵感来自 Orhun Parmaksız 的 Ratty——一个用 GPU 渲染、内嵌 3D 图形的终端。他们的老鼠在终端里追逐像素；我们的猫从 RealityKit 中看着这一切发生。" } }
+      }
+    },
+    "The rat 3D model in this scene also ships courtesy of Ratty (MIT). Maxwell the cat comes from bean (alwayshasbean) on Sketchfab under CC-BY 4.0." : {
+      "comment" : "Asset attribution. \"Ratty\", \"Maxwell\", \"bean\", \"alwayshasbean\", \"Sketchfab\", \"MIT\", \"CC-BY 4.0\" are DNT.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Das 3D-Modell der Ratte in dieser Szene stammt ebenfalls von Ratty (MIT). Maxwell die Katze stammt von bean (alwayshasbean) auf Sketchfab unter CC-BY 4.0." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "El modelo 3D de la rata en esta escena también se incluye gracias a Ratty (MIT). Maxwell, el gato, viene de bean (alwayshasbean) en Sketchfab bajo CC-BY 4.0." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "El modelo 3D de la rata en esta escena también se incluye gracias a Ratty (MIT). Maxwell, el gato, viene de bean (alwayshasbean) en Sketchfab bajo CC-BY 4.0." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le modèle 3D du rat dans cette scène est également fourni par Ratty (MIT). Maxwell le chat vient de bean (alwayshasbean) sur Sketchfab sous licence CC-BY 4.0." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Anche il modello 3D del topo in questa scena è fornito da Ratty (MIT). Maxwell il gatto viene da bean (alwayshasbean) su Sketchfab con licenza CC-BY 4.0." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このシーンのネズミの 3D モデルも Ratty (MIT) によるものです。Maxwell（猫）は Sketchfab の bean (alwayshasbean) による作品で、CC-BY 4.0 ライセンスです。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Het 3D-model van de rat in deze scène komt ook van Ratty (MIT). Maxwell de kat komt van bean (alwayshasbean) op Sketchfab onder CC-BY 4.0." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O modelo 3D do rato nesta cena também é cortesia do Ratty (MIT). Maxwell, o gato, vem do bean (alwayshasbean) no Sketchfab, sob CC-BY 4.0." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "O modelo 3D do rato nesta cena também é cortesia de Ratty (MIT). Maxwell, o gato, vem de bean (alwayshasbean) no Sketchfab, sob CC-BY 4.0." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "本场景中的老鼠 3D 模型同样由 Ratty (MIT) 提供。Maxwell 这只猫来自 Sketchfab 上的 bean (alwayshasbean)，依据 CC-BY 4.0 许可。" } }
+      }
+    },
+    "Spawn a new local terminal here" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Hier ein neues lokales Terminal erstellen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Crea una nueva terminal local aquí" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Crea un nuevo terminal local aquí" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Créer un nouveau terminal local ici" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Crea un nuovo terminale locale qui" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ここに新しいローカルターミナルを生成" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Maak hier een nieuwe lokale terminal aan" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Crie um novo terminal local aqui" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Cria um novo terminal local aqui" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在此处生成新的本地终端" } }
+      }
+    },
+    "Spawn a new local terminal to the %@" : {
+      "comment" : "%@ is a grid coord identifier (e.g. r0c1). Will be improved later.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neues lokales Terminal an Position %@ erstellen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Crea una nueva terminal local en %@" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Crea un nuevo terminal local en %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Créer un nouveau terminal local en %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Crea un nuovo terminale locale in %@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%@ に新しいローカルターミナルを生成" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Maak een nieuwe lokale terminal op %@" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Crie um novo terminal local em %@" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Cria um novo terminal local em %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在 %@ 处生成新的本地终端" } }
+      }
+    },
+    "Remove the %@ terminal" : {
+      "comment" : "%@ is a grid coord identifier (e.g. r0c1).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Terminal an %@ entfernen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar la terminal de %@" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar el terminal de %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le terminal de %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Rimuovi il terminale di %@" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%@ のターミナルを削除" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Verwijder de terminal op %@" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Remover o terminal de %@" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Remover o terminal de %@" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "移除 %@ 处的终端" } }
+      }
+    },
+    "Close Catty 3D" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Catty 3D schließen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Cerrar Catty 3D" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Cerrar Catty 3D" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quitter Catty 3D" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Chiudi Catty 3D" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Catty 3D を終了" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Catty 3D sluiten" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Fechar Catty 3D" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Fechar Catty 3D" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭 Catty 3D" } }
+      }
+    },
+    "Send Maxwell after the rat — zoom out to watch the chase" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Schick Maxwell hinter der Ratte her — zoom raus, um die Jagd zu sehen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Manda a Maxwell tras la rata — aleja la cámara para ver la persecución" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Manda a Maxwell tras la rata — aleja la cámara para ver la persecución" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Lance Maxwell à la poursuite du rat — dézoome pour voir la course" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Manda Maxwell all'inseguimento del topo — allontana la camera per vedere la corsa" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell をネズミに差し向ける — ズームアウトして追いかけっこを見守ろう" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Stuur Maxwell achter de rat aan — zoom uit om de jacht te volgen" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Mande o Maxwell atrás do rato — afaste a câmera para ver a perseguição" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Manda o Maxwell atrás do rato — afasta a câmara para ver a perseguição" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "让 Maxwell 追逐老鼠——拉远视角观看这场追逐" } }
+      }
+    },
+    "Return to default view (100% zoom, centred)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zur Standardansicht zurückkehren (100 % Zoom, zentriert)" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Volver a la vista predeterminada (100 % de zoom, centrada)" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Volver a la vista predeterminada (100 % de zoom, centrada)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Revenir à la vue par défaut (zoom 100 %, centrée)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Torna alla vista predefinita (zoom 100%, centrata)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "デフォルトビューに戻る（100% ズーム、中央寄せ）" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Terug naar standaardweergave (100% zoom, gecentreerd)" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Voltar à vista padrão (100% de zoom, centralizada)" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Voltar à vista predefinida (100% de zoom, centrada)" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "返回默认视图（100% 缩放，居中）" } }
+      }
+    },
+    "Drag to zoom (works even while a terminal is focused)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zum Zoomen ziehen (funktioniert auch, wenn ein Terminal aktiv ist)" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Arrastra para hacer zoom (funciona incluso con una terminal en foco)" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Arrastra para hacer zoom (funciona incluso con un terminal en foco)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Faire glisser pour zoomer (fonctionne même quand un terminal a le focus)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Trascina per fare zoom (funziona anche con un terminale attivo)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ドラッグでズーム（ターミナルがフォーカスされていても機能します）" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Sleep om te zoomen (werkt ook als een terminal actief is)" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Arraste para dar zoom (funciona mesmo com um terminal em foco)" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Arrasta para fazer zoom (funciona mesmo com um terminal em foco)" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "拖动以缩放（即使终端处于焦点时也可用）" } }
+      }
+    },
+    "Hide debug panel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Debug-Panel ausblenden" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Ocultar panel de depuración" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Ocultar panel de depuración" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Masquer le panneau de débogage" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nascondi il pannello di debug" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "デバッグパネルを隠す" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Debugpaneel verbergen" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Ocultar painel de depuração" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Ocultar painel de depuração" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "隐藏调试面板" } }
+      }
+    },
+    "Show debug panel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Debug-Panel anzeigen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar panel de depuración" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar panel de depuración" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher le panneau de débogage" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra il pannello di debug" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "デバッグパネルを表示" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Debugpaneel tonen" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar painel de depuração" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar painel de depuração" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "显示调试面板" } }
+      }
+    },
+    "Exit compose mode (⌘⇧I)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kompositionsmodus verlassen (⌘⇧I)" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Salir del modo composición (⌘⇧I)" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Salir del modo composición (⌘⇧I)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quitter le mode composition (⌘⇧I)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Esci dalla modalità composizione (⌘⇧I)" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "合成モードを終了 (⌘⇧I)" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Compositiemodus verlaten (⌘⇧I)" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Sair do modo de composição (⌘⇧I)" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Sair do modo de composição (⌘⇧I)" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "退出合成模式 (⌘⇧I)" } }
+      }
+    },
+    "Compose for icon — hides UI + freezes the orbit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Für Symbol komponieren — UI ausblenden und Umlaufbahn einfrieren" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Componer para el ícono — oculta la interfaz y congela la órbita" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Componer para el icono — oculta la interfaz y congela la órbita" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Composer pour l'icône — masque l'interface et fige l'orbite" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Componi per l'icona — nasconde l'interfaccia e blocca l'orbita" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "アイコン用に構図を決める — UI を隠して軌道を停止" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Componeer voor het pictogram — verbergt de interface en zet de baan stil" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Compor para o ícone — esconde a interface e congela a órbita" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Compor para o ícone — esconde a interface e congela a órbita" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "为图标取景——隐藏界面并冻结轨道动画" } }
+      }
+    },
+    "%@  ·  Long-press for picker" : {
+      "comment" : "%@ is the camera-mode helpText. Tooltip composition.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Lang drücken für Auswahl" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Mantén presionado para abrir el selector" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Mantén pulsado para abrir el selector" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Appui long pour ouvrir le sélecteur" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Tieni premuto per il selettore" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  長押しでピッカーを開く" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Houd ingedrukt voor selector" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Pressione e segure para abrir o seletor" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  Toque longo para abrir o seletor" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%@  ·  长按打开选择器" } }
+      }
+    },
+    "Flat plane. Click to wrap onto a curved screen." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Flache Ebene. Klicken, um auf einen gewölbten Bildschirm zu wechseln." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Plano. Haz clic para envolver en una pantalla curva." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Plano. Pulsa para envolver en una pantalla curva." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plan plat. Cliquer pour passer en écran courbé." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Superficie piatta. Clicca per passare a uno schermo curvo." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "平面。クリックすると曲面スクリーンに切り替わります。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Plat vlak. Klik om over te schakelen naar een gebogen scherm." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Plano. Clique para envolver em uma tela curva." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Plano. Clica para envolver num ecrã curvo." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "平面。点击切换为曲面屏。" } }
+      }
+    },
+    "Cinemascope curve. Click to wrap into a Möbius strip." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Cinemascope-Krümmung. Klicken, um zu einem Möbiusband zu wechseln." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Curva cinemascope. Haz clic para envolver en una banda de Möbius." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Curva cinemascope. Pulsa para envolver en una banda de Möbius." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Courbe cinémascope. Cliquer pour passer à un ruban de Möbius." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Curva cinemascope. Clicca per passare a un nastro di Möbius." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "シネマスコープカーブ。クリックするとメビウスの輪に切り替わります。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Cinemascope-kromming. Klik om over te schakelen naar een Möbius-band." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Curva cinemascope. Clique para envolver em uma fita de Möbius." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Curva cinemascope. Clica para envolver numa fita de Möbius." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "影院级曲面。点击切换为莫比乌斯环。" } }
+      }
+    },
+    "Möbius strip. Click for warp distortion." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Möbiusband. Klicken für Warp-Verzerrung." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Banda de Möbius. Haz clic para distorsión warp." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Banda de Möbius. Pulsa para distorsión warp." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ruban de Möbius. Cliquer pour la distorsion warp." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nastro di Möbius. Clicca per la distorsione warp." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "メビウスの輪。クリックでワープ歪みに切り替わります。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Möbius-band. Klik voor warp-vervorming." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Fita de Möbius. Clique para distorção warp." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Fita de Möbius. Clica para distorção warp." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "莫比乌斯环。点击切换为 warp 形变。" } }
+      }
+    },
+    "Centre-bulge warp. Click to return to flat." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mittige Wölbung. Klicken, um zur flachen Ansicht zurückzukehren." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Distorsión central. Haz clic para volver a plano." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Distorsión central. Pulsa para volver a plano." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Distorsion centrale. Cliquer pour revenir au plan plat." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Distorsione centrale. Clicca per tornare alla superficie piatta." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "中央が膨らんだワープ。クリックで平面に戻ります。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Vervorming in het midden. Klik om terug te keren naar plat." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Distorção central. Clique para voltar para plano." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Distorção central. Clica para voltar a plano." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "中央凸起形变。点击返回平面。" } }
+      }
+    },
+    "Orbit camera (turntable)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Orbit-Kamera (Drehteller)." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Cámara orbital (plato giratorio)." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Cámara orbital (plato giratorio)." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Caméra orbitale (plateau tournant)." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Camera orbitale (giradischi)." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "軌道カメラ（ターンテーブル）。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Orbit-camera (draaitafel)." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Câmera orbital (prato giratório)." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Câmara orbital (prato giratório)." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "环绕摄像机（转盘式）。" } }
+      }
+    },
+    "Ride along on the rat." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Auf der Ratte mitfahren." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Súbete a la rata." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Súbete a la rata." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Embarquer sur le dos du rat." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sali in groppa al topo." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ネズミに乗って追走する。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Rijd mee op de rat." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Pegue carona no rato." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Anda em cima do rato." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "骑在老鼠身上同行。" } }
+      }
+    },
+    "See the world from Maxwell's POV (he pirouettes)." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Welt aus Maxwells Sicht sehen (er dreht sich)." } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Mira el mundo desde el punto de vista de Maxwell (que hace piruetas)." } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Mira el mundo desde el punto de vista de Maxwell (que hace piruetas)." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Voir le monde du point de vue de Maxwell (il pirouette)." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Guarda il mondo dal punto di vista di Maxwell (che piroetta)." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell の視点で世界を見る（くるくる回ります）。" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Bekijk de wereld vanuit Maxwells perspectief (hij maakt piruetten)." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Veja o mundo do ponto de vista do Maxwell (ele faz piruetas)." } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Vê o mundo do ponto de vista de Maxwell (ele dá piruetas)." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "从 Maxwell 的视角看世界（他会原地旋转）。" } }
+      }
+    },
+    "drag to orbit · ⌥-drag to pan · scroll to zoom" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ziehen zum Orbitieren · ⌥-Ziehen zum Schwenken · Scrollen zum Zoomen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "arrastra para orbitar · ⌥-arrastra para mover · desplaza para hacer zoom" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "arrastra para orbitar · ⌥-arrastra para desplazar · desplaza para hacer zoom" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "glisser pour orbiter · ⌥-glisser pour panoramique · molette pour zoomer" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "trascina per orbitare · ⌥-trascina per panoramica · scorri per fare zoom" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ドラッグで周回 · ⌥-ドラッグでパン · スクロールでズーム" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "sleep om te orbiteren · ⌥-sleep om te pannen · scrol om te zoomen" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "arraste para orbitar · ⌥-arraste para deslocar · role para dar zoom" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "arrasta para orbitar · ⌥-arrasta para deslocar · desliza para fazer zoom" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "拖动以环绕 · ⌥-拖动以平移 · 滚动以缩放" } }
+      }
+    },
+    "drag to look around · scroll to peek further" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ziehen zum Umsehen · Scrollen für weitere Blicke" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "arrastra para mirar alrededor · desplaza para ver más allá" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "arrastra para mirar alrededor · desplaza para ver más allá" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "glisser pour regarder autour · molette pour voir plus loin" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "trascina per guardarti intorno · scorri per spiare più lontano" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ドラッグで見回す · スクロールで先まで覗く" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "sleep om rond te kijken · scrol om verder te kijken" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "arraste para olhar ao redor · role para espiar mais longe" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "arrasta para olhar à volta · desliza para espreitar mais longe" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "拖动以环顾 · 滚动以远眺" } }
+      }
+    },
+    "Radius" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Radius" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Radio" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Radio" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rayon" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Raggio" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "半径" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Straal" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Raio" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Raio" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "半径" } }
+      }
+    },
+    "Speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Geschwindigkeit" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Velocidad" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Velocidad" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vitesse" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Velocità" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "速度" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Snelheid" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Velocidade" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Velocidade" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "速度" } }
+      }
+    },
+    "Maxwell phase" : {
+      "comment" : "\"Maxwell\" stays English (DNT) — only translate \"phase\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell-Phase" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Fase de Maxwell" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Fase de Maxwell" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Phase de Maxwell" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Fase di Maxwell" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell の位相" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Fase van Maxwell" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Fase do Maxwell" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Fase de Maxwell" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell 相位" } }
+      }
+    },
+    "Maxwell spin" : {
+      "comment" : "\"Maxwell\" stays English (DNT) — only translate \"spin\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell-Drehung" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Giro de Maxwell" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Giro de Maxwell" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rotation de Maxwell" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Rotazione di Maxwell" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell の回転" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Spin van Maxwell" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Rotação do Maxwell" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Rotação de Maxwell" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell 旋转" } }
+      }
+    },
+    "Maxwell scale" : {
+      "comment" : "\"Maxwell\" stays English (DNT) — only translate \"scale\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell-Skalierung" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Escala de Maxwell" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Escala de Maxwell" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Échelle de Maxwell" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Scala di Maxwell" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell のスケール" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Schaal van Maxwell" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Escala do Maxwell" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Escala de Maxwell" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Maxwell 缩放" } }
+      }
+    },
+    "Rat scale" : {
+      "comment" : "\"Rat\" here is the rat (animal) in the scene, not Ratty (the tool). Translate as the animal.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ratten-Skalierung" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Escala de la rata" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Escala de la rata" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Échelle du rat" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Scala del topo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ネズミのスケール" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Schaal van de rat" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Escala do rato" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Escala do rato" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "老鼠缩放" } }
+      }
+    },
+    "Terminal alpha" : {
+      "comment" : "\"alpha\" = opacity / transparency.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Terminal-Transparenz" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Opacidad de la terminal" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Opacidad del terminal" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Opacité du terminal" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Opacità del terminale" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ターミナルの透明度" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Terminal-transparantie" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Opacidade do terminal" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Opacidade do terminal" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "终端透明度" } }
+      }
+    },
+    "Terminal" : {
+      "comment" : "Debug-minimap label for the terminal plane.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Terminal" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Terminal" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Terminal" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Terminal" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Terminale" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ターミナル" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Terminal" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Terminal" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Terminal" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "终端" } }
+      }
+    },
+    "Flat" : {
+      "comment" : "Surface mode display name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Flach" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Plano" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Plano" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plat" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Piatto" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "平面" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Plat" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Plano" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Plano" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "平面" } }
+      }
+    },
+    "Curved" : {
+      "comment" : "Surface mode display name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gewölbt" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Curvo" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Curvo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Courbé" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Curvo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "曲面" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Gebogen" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Curvo" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Curvo" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "曲面" } }
+      }
+    },
+    "Möbius" : {
+      "comment" : "Surface mode display name. Proper-noun reference to the mathematician.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "メビウス" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Möbius" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "莫比乌斯" } }
+      }
+    },
+    "Warp" : {
+      "comment" : "Surface mode display name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verzerrung" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Distorsión" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Distorsión" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Distorsion" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Distorsione" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ワープ" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Vervorming" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Distorção" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Distorção" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "形变" } }
+      }
+    },
+    "Orbit" : {
+      "comment" : "Camera mode display name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Orbit" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Órbita" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Órbita" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Orbite" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Orbita" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "軌道" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Orbit" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Órbita" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Órbita" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "环绕" } }
+      }
+    },
+    "Rat POV" : {
+      "comment" : "Camera mode display name. \"POV\" = point of view.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ratten-Sicht" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Vista de la rata" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Vista de la rata" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vue du rat" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Vista del topo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ネズミ視点" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Rat-perspectief" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Vista do rato" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Vista do rato" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "老鼠视角" } }
+      }
+    },
+    "Cat POV" : {
+      "comment" : "Camera mode display name. \"POV\" = point of view.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Katzen-Sicht" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Vista del gato" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Vista del gato" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vue du chat" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Vista del gatto" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "猫視点" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Kat-perspectief" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Vista do gato" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Vista do gato" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "猫视角" } }
+      }
+    }
+  }
+}

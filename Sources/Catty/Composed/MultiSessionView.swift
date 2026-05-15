@@ -95,7 +95,7 @@ public struct CattyMultiSessionView<Store: CattySessionStore>: View {
                 // an overlay banner so it's obvious the layout is unbuilt.
                 ZStack(alignment: .top) {
                     singleActiveBody
-                    Text("Layout \(String(describing: layout)) not yet implemented — showing active session only")
+                    Text("Layout \(String(describing: layout)) not yet implemented — showing active session only", bundle: .module)
                         .font(.caption)
                         .padding(6)
                         .background(.yellow.opacity(0.85), in: Capsule())
@@ -154,9 +154,9 @@ private struct EmptyStateView: View {
         VStack(spacing: 12) {
             Text("🐀")
                 .font(.system(size: 48))
-            Text("No sessions yet")
+            Text("No sessions yet", bundle: .module)
                 .font(.title3)
-            Text("Open a local terminal or connect via SSH to get started.")
+            Text("Open a local terminal or connect via SSH to get started.", bundle: .module)
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }

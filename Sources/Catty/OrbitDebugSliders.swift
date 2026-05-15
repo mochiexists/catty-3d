@@ -31,18 +31,18 @@ struct OrbitDebugSliders: View {
     }
 
     private func row(
-        _ label: String,
+        _ label: LocalizedStringKey,
         value: Binding<Float>,
         range: ClosedRange<Float>,
         format: String
     ) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack {
-                Text(label)
+                Text(label, bundle: .module)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.white.opacity(0.75))
                 Spacer()
-                Text(String(format: format, value.wrappedValue))
+                Text(verbatim: String(format: format, value.wrappedValue))
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.9))
             }

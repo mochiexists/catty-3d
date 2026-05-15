@@ -34,10 +34,10 @@ public enum TerminalSurfaceMode: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .flat: return "Flat"
-        case .curved: return "Curved"
-        case .mobius: return "Möbius"
-        case .warp: return "Warp"
+        case .flat: return String(localized: "Flat", bundle: .module)
+        case .curved: return String(localized: "Curved", bundle: .module)
+        case .mobius: return String(localized: "Möbius", bundle: .module)
+        case .warp: return String(localized: "Warp", bundle: .module)
         }
     }
 
@@ -52,10 +52,10 @@ public enum TerminalSurfaceMode: String, CaseIterable {
 
     var helpText: String {
         switch self {
-        case .flat: return "Flat plane. Click to wrap onto a curved screen."
-        case .curved: return "Cinemascope curve. Click to wrap into a Möbius strip."
-        case .mobius: return "Möbius strip. Click for warp distortion."
-        case .warp: return "Centre-bulge warp. Click to return to flat."
+        case .flat: return String(localized: "Flat plane. Click to wrap onto a curved screen.", bundle: .module)
+        case .curved: return String(localized: "Cinemascope curve. Click to wrap into a Möbius strip.", bundle: .module)
+        case .mobius: return String(localized: "Möbius strip. Click for warp distortion.", bundle: .module)
+        case .warp: return String(localized: "Centre-bulge warp. Click to return to flat.", bundle: .module)
         }
     }
 
@@ -84,9 +84,9 @@ public enum CameraMode: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .orbit: return "Orbit"
-        case .ratPOV: return "Rat POV"
-        case .catPOV: return "Cat POV"
+        case .orbit: return String(localized: "Orbit", bundle: .module)
+        case .ratPOV: return String(localized: "Rat POV", bundle: .module)
+        case .catPOV: return String(localized: "Cat POV", bundle: .module)
         }
     }
 
@@ -110,18 +110,18 @@ public enum CameraMode: String, CaseIterable {
 
     var helpText: String {
         switch self {
-        case .orbit: return "Orbit camera (turntable)."
-        case .ratPOV: return "Ride along on the rat."
-        case .catPOV: return "See the world from Maxwell's POV (he pirouettes)."
+        case .orbit: return String(localized: "Orbit camera (turntable).", bundle: .module)
+        case .ratPOV: return String(localized: "Ride along on the rat.", bundle: .module)
+        case .catPOV: return String(localized: "See the world from Maxwell's POV (he pirouettes).", bundle: .module)
         }
     }
 
     var controlHint: String {
         switch self {
         case .orbit:
-            return "drag to orbit · ⌥-drag to pan · scroll to zoom"
+            return String(localized: "drag to orbit · ⌥-drag to pan · scroll to zoom", bundle: .module)
         case .ratPOV, .catPOV:
-            return "drag to look around · scroll to peek further"
+            return String(localized: "drag to look around · scroll to peek further", bundle: .module)
         }
     }
 }
@@ -567,8 +567,8 @@ public struct Terminal3DSceneView: View {
                 }
                 .buttonStyle(.plain)
                 .help(iconComposeMode
-                      ? "Exit compose mode (⌘⇧I)"
-                      : "Compose for icon — hides UI + freezes the orbit")
+                      ? String(localized: "Exit compose mode (⌘⇧I)", bundle: .module)
+                      : String(localized: "Compose for icon — hides UI + freezes the orbit", bundle: .module))
                 .keyboardShortcut("i", modifiers: [.command, .shift])
                 .padding(.trailing, 16)
                 .padding(.top, 10)
@@ -693,7 +693,7 @@ public struct Terminal3DSceneView: View {
                 )
         }
         .buttonStyle(.plain)
-        .help("Spawn a new local terminal here")
+        .help(String(localized: "Spawn a new local terminal here", bundle: .module))
     }
 
     // (legacy cardinal arrow API kept below for reference — unused
@@ -710,7 +710,7 @@ public struct Terminal3DSceneView: View {
                 .overlay(Circle().stroke(.white.opacity(0.2), lineWidth: 1))
         }
         .buttonStyle(.plain)
-        .help("Spawn a new local terminal to the \(slot.rawValue)")
+        .help(String(localized: "Spawn a new local terminal to the \(slot.rawValue)", bundle: .module))
     }
 
     private func closeChip(for slot: PaneSlot) -> some View {
@@ -725,7 +725,7 @@ public struct Terminal3DSceneView: View {
                 .overlay(Circle().stroke(.white.opacity(0.25), lineWidth: 1))
         }
         .buttonStyle(.plain)
-        .help("Remove the \(slot.rawValue) terminal")
+        .help(String(localized: "Remove the \(slot.rawValue) terminal", bundle: .module))
     }
 
     // offsetForArrow is no longer needed — spawn squares are
@@ -883,7 +883,7 @@ public struct Terminal3DSceneView: View {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(.white.opacity(0.12), lineWidth: 1)
                 )
-                .help("Close Catty")
+                .help(String(localized: "Close Catty 3D", bundle: .module))
                 .padding(16)
                 Spacer()
             }
@@ -962,7 +962,7 @@ public struct Terminal3DSceneView: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(.white.opacity(0.1), lineWidth: 1)
         )
-        .help("Send Maxwell after the rat — zoom out to watch the chase")
+        .help(String(localized: "Send Maxwell after the rat — zoom out to watch the chase", bundle: .module))
         .padding(16)
     }
 
@@ -974,8 +974,8 @@ public struct Terminal3DSceneView: View {
         VStack(spacing: 8) {
             // Rat transforms into Home — same slot, different meaning.
             iconButton(systemName: "house", action: resetView)
-                .help("Return to default view (100% zoom, centred)")
-            Text("\(Int(zoom * 100))%")
+                .help(String(localized: "Return to default view (100% zoom, centred)", bundle: .module))
+            Text(verbatim: "\(Int(zoom * 100))%")
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(.white.opacity(0.6))
 
@@ -987,7 +987,7 @@ public struct Terminal3DSceneView: View {
                 .controlSize(.mini)
                 .frame(width: 64)
                 .tint(.white.opacity(0.55))
-                .help("Drag to zoom (works even while a terminal is focused)")
+                .help(String(localized: "Drag to zoom (works even while a terminal is focused)", bundle: .module))
 
             // Settings / Orbit / Flat — progressive disclosure. They
             // appear only after the rat has been pressed, so the
@@ -1000,7 +1000,9 @@ public struct Terminal3DSceneView: View {
                         : "slider.horizontal.3",
                     action: toggleDebugPanel
                 )
-                .help(showDebugPanel ? "Hide debug panel" : "Show debug panel")
+                .help(showDebugPanel
+                      ? String(localized: "Hide debug panel", bundle: .module)
+                      : String(localized: "Show debug panel", bundle: .module))
 
                 Divider().frame(width: 24).background(.white.opacity(0.15))
                 Menu {
@@ -1040,7 +1042,7 @@ public struct Terminal3DSceneView: View {
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
                 .fixedSize()
-                .help("\(cameraMode.helpText)  ·  Long-press for picker")
+                .help(String(localized: "\(cameraMode.helpText)  ·  Long-press for picker", bundle: .module))
                 Text(cameraMode.displayName)
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(.white.opacity(0.6))
@@ -1103,11 +1105,11 @@ public struct Terminal3DSceneView: View {
             HStack(spacing: 8) {
                 Text("🐀")
                     .font(.title2)
-                Text("Inspired by Ratty")
+                Text("Inspired by Ratty", bundle: .module)
                     .font(.headline)
             }
 
-            Text("Catty's terminal-in-a-3D-scene idea comes from Ratty by Orhun Parmaksız — a GPU-rendered terminal with inline 3D graphics. Their rat chases pixels in a terminal; our cat watches it happen from RealityKit.")
+            Text("The terminal-in-a-3D-scene idea behind Catty 3D comes from Ratty by Orhun Parmaksız — a GPU-rendered terminal with inline 3D graphics. Their rat chases pixels in a terminal; our cat watches it happen from RealityKit.", bundle: .module)
                 .font(.callout)
                 .foregroundStyle(.primary.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
@@ -1116,14 +1118,14 @@ public struct Terminal3DSceneView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.up.right.square")
                         .font(.system(size: 12))
-                    Text("github.com/orhun/ratty")
+                    Text(verbatim: "github.com/orhun/ratty")
                         .font(.callout)
                 }
             }
 
             Divider()
 
-            Text("The rat 3D model in this scene also ships courtesy of Ratty (MIT). Maxwell the cat comes from bean (alwayshasbean) on Sketchfab under CC-BY 4.0.")
+            Text("The rat 3D model in this scene also ships courtesy of Ratty (MIT). Maxwell the cat comes from bean (alwayshasbean) on Sketchfab under CC-BY 4.0.", bundle: .module)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

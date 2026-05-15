@@ -79,7 +79,7 @@ struct OrbitDebugMinimap: View {
             with: .color(.white.opacity(0.85))
         )
         ctx.draw(
-            Text("Terminal").font(.system(size: 9)).foregroundColor(.white.opacity(0.7)),
+            Text("Terminal", bundle: .module).font(.system(size: 9)).foregroundColor(.white.opacity(0.7)),
             at: CGPoint(x: centre.x, y: centre.y - 14)
         )
 
