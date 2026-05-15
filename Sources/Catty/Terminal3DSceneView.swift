@@ -696,23 +696,6 @@ public struct Terminal3DSceneView: View {
         .help(String(localized: "Spawn a new local terminal here", bundle: .module))
     }
 
-    // (legacy cardinal arrow API kept below for reference — unused
-    // now that spawning is grid-coord based.)
-    private func spawnArrow(for slot: PaneSlot) -> some View {
-        Button {
-            spawnPane(at: slot)
-        } label: {
-            Image(systemName: "plus.circle.fill")
-                .font(.system(size: 36, weight: .medium))
-                .foregroundStyle(.white.opacity(0.95))
-                .frame(width: 56, height: 56)
-                .background(.black.opacity(0.55), in: Circle())
-                .overlay(Circle().stroke(.white.opacity(0.2), lineWidth: 1))
-        }
-        .buttonStyle(.plain)
-        .help(String(localized: "Spawn a new local terminal to the \(slot.rawValue)", bundle: .module))
-    }
-
     private func closeChip(for slot: PaneSlot) -> some View {
         Button {
             removePane(at: slot)
@@ -725,7 +708,7 @@ public struct Terminal3DSceneView: View {
                 .overlay(Circle().stroke(.white.opacity(0.25), lineWidth: 1))
         }
         .buttonStyle(.plain)
-        .help(String(localized: "Remove the \(slot.rawValue) terminal", bundle: .module))
+        .help(String(localized: "Remove this terminal", bundle: .module))
     }
 
     // offsetForArrow is no longer needed — spawn squares are

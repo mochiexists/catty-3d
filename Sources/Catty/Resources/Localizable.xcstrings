@@ -145,36 +145,19 @@
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在此处生成新的本地终端" } }
       }
     },
-    "Spawn a new local terminal to the %@" : {
-      "comment" : "%@ is a grid coord identifier (e.g. r0c1). Will be improved later.",
+    "Remove this terminal" : {
       "extractionState" : "manual",
       "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neues lokales Terminal an Position %@ erstellen" } },
-        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Crea una nueva terminal local en %@" } },
-        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Crea un nuevo terminal local en %@" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Créer un nouveau terminal local en %@" } },
-        "it" : { "stringUnit" : { "state" : "translated", "value" : "Crea un nuovo terminale locale in %@" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%@ に新しいローカルターミナルを生成" } },
-        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Maak een nieuwe lokale terminal op %@" } },
-        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Crie um novo terminal local em %@" } },
-        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Cria um novo terminal local em %@" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在 %@ 处生成新的本地终端" } }
-      }
-    },
-    "Remove the %@ terminal" : {
-      "comment" : "%@ is a grid coord identifier (e.g. r0c1).",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Terminal an %@ entfernen" } },
-        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar la terminal de %@" } },
-        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar el terminal de %@" } },
-        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer le terminal de %@" } },
-        "it" : { "stringUnit" : { "state" : "translated", "value" : "Rimuovi il terminale di %@" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%@ のターミナルを削除" } },
-        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Verwijder de terminal op %@" } },
-        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Remover o terminal de %@" } },
-        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Remover o terminal de %@" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "移除 %@ 处的终端" } }
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dieses Terminal entfernen" } },
+        "es-419" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar esta terminal" } },
+        "es-ES" : { "stringUnit" : { "state" : "translated", "value" : "Eliminar este terminal" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer ce terminal" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Rimuovi questo terminale" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このターミナルを削除" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Verwijder deze terminal" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Remover este terminal" } },
+        "pt-PT" : { "stringUnit" : { "state" : "translated", "value" : "Remover este terminal" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "移除此终端" } }
       }
     },
     "Close Catty 3D" : {
