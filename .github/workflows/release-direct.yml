@@ -3,8 +3,9 @@
 # Tag-driven release pipeline for the Outdoor (Direct Download) channel
 # of Catty. Mirrors the structure used by Local AI Cat:
 #
-#   * Trigger: tag push of `release/v*+*` (the `+N` build suffix is
-#     parsed in shell because GitHub Actions tag globs reject `+`)
+#   * Trigger: tag push of `release/v*`; the `+N` build suffix is
+#     validated in shell because GitHub Actions tag globs treat `+`
+#     inconsistently.
 #     OR manual workflow_dispatch (with optional auto-bumped build N).
 #   * Validate the build number is strictly greater than the highest
 #     previous successful release.
@@ -70,7 +71,7 @@ on:
         default: ""
   push:
     tags:
-      - "release/v*+*"
+      - "release/v*"
 
 permissions:
   contents: read
