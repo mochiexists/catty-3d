@@ -51,6 +51,10 @@ let package = Package(
     ],
     dependencies: [
         .package(
+            url: "https://github.com/sparkle-project/Sparkle",
+            exact: "2.8.1"
+        ),
+        .package(
             url: "https://github.com/migueldeicaza/SwiftTerm.git",
             branch: "main"
         ),
@@ -85,7 +89,10 @@ let package = Package(
         // Executable target — standalone macOS app sources.
         .executableTarget(
             name: "CattyApp",
-            dependencies: ["Catty"],
+            dependencies: [
+                "Catty",
+                .product(name: "Sparkle", package: "Sparkle")
+            ],
             path: "App"
         )
     ]

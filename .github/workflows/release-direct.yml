@@ -26,6 +26,7 @@
 #   APPLE_ID                        Apple ID email used for notarization
 #   APPLE_TEAM_ID                   10-char team ID
 #   APPLE_APP_SPECIFIC_PASSWORD     App-specific password from appleid.apple.com
+#   SPARKLE_PRIVATE_KEY             Sparkle EdDSA private key for appcast signing
 #   LOCAL_XCCONFIG_BASE64           Local.xcconfig contents, base64
 #   APP_ID                          (optional) GitHub App ID for cross-repo + auto-promote
 #   APP_PRIVATE_KEY                 (optional) GitHub App private key
@@ -159,13 +160,24 @@ jobs:
       - name: Materialize Local.xcconfig
         env:
           LOCAL_XCCONFIG_BASE64: ${{ secrets.LOCAL_XCCONFIG_BASE64 }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           if [ -z "$LOCAL_XCCONFIG_BASE64" ]; then
             echo "::error::LOCAL_XCCONFIG_BASE64 secret is empty."
             exit 1
           fi
+          if [ -z "$SPARKLE_PRIVATE_KEY" ]; then
+            echo "::error::SPARKLE_PRIVATE_KEY secret is empty."
+            exit 1
+          fi
           printf '%s' "$LOCAL_XCCONFIG_BASE64" | base64 --decode > Local.xcconfig
+          SPARKLE_PUBLIC_KEY="$(swift scripts/derive_sparkle_public_key.swift "$SPARKLE_PRIVATE_KEY")"
+          if grep -q '^SPARKLE_ED_PUBLIC_KEY[[:space:]]*=' Local.xcconfig; then
+            /usr/bin/sed -i '' "s|^SPARKLE_ED_PUBLIC_KEY[[:space:]]*=.*|SPARKLE_ED_PUBLIC_KEY = ${SPARKLE_PUBLIC_KEY}|" Local.xcconfig
+          else
+            printf '\nSPARKLE_ED_PUBLIC_KEY = %s\n' "$SPARKLE_PUBLIC_KEY" >> Local.xcconfig
+          fi
           chmod 600 Local.xcconfig
 
       - name: Install build deps
@@ -360,38 +372,20 @@ jobs:
           xcrun stapler staple "build/direct/$DMG_NAME"
           xcrun stapler validate "build/direct/$DMG_NAME"
 
-      - name: Generate Sparkle appcast (placeholder)
+      - name: Generate signed Sparkle appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           DMG_NAME="Catty-${RELEASE_VERSION}.dmg"
           DMG_PATH="build/direct/$DMG_NAME"
-          DMG_SIZE=$(stat -f%z "$DMG_PATH")
-          DOWNLOAD_PREFIX="https://github.com/mochiexists/catty3d-site/releases/latest/download"
-
-          # Sparkle EdDSA signing comes online when SPARKLE_PRIVATE_KEY is set
-          # AND Sparkle.framework is in the SPM closure. Until then we ship an
-          # appcast.xml without an edSignature so the file is in place for
-          # later auto-update wiring without changing the URL.
-          cat > build/direct/appcast.xml <<APPCAST
-          <?xml version="1.0" encoding="utf-8"?>
-          <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
-            <channel>
-              <title>Catty 3D Updates</title>
-              <link>${DOWNLOAD_PREFIX}/appcast.xml</link>
-              <description>Most recent updates for Catty 3D</description>
-              <language>en</language>
-              <item>
-                <title>Version ${RELEASE_VERSION}</title>
-                <sparkle:version>${RELEASE_BUILD}</sparkle:version>
-                <sparkle:shortVersionString>${RELEASE_VERSION}</sparkle:shortVersionString>
-                <description><![CDATA[<p>Catty 3D ${RELEASE_VERSION} (build ${RELEASE_BUILD}).</p>]]></description>
-                <pubDate>$(date -u "+%a, %d %b %Y %H:%M:%S %z")</pubDate>
-                <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-                <enclosure url="${DOWNLOAD_PREFIX}/${DMG_NAME}" length="${DMG_SIZE}" type="application/octet-stream" />
-              </item>
-            </channel>
-          </rss>
-          APPCAST
+          if [ -z "$SPARKLE_PRIVATE_KEY" ]; then
+            echo "::error::SPARKLE_PRIVATE_KEY secret is empty."
+            exit 1
+          fi
+          DOWNLOAD_URL_PREFIX="https://github.com/mochiexists/catty3d-site/releases/latest/download/" \
+          RELEASE_NOTES_URL="https://github.com/mochiexists/catty3d-site/releases/tag/v${RELEASE_VERSION}" \
+            ./scripts/sparkle_generate_appcast.sh "$DMG_PATH" "v${RELEASE_VERSION}" build/direct/appcast.xml
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

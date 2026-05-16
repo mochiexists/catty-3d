@@ -96,7 +96,7 @@ fi
 # ─────────────── 1. APPLE_TEAM_ID ───────────────
 
 if ! skip_check "APPLE_TEAM_ID"; then
-  echo "── 1/7 APPLE_TEAM_ID ────────────────────────────────────────"
+  echo "── 1/8 APPLE_TEAM_ID ────────────────────────────────────────"
   echo "Your 10-character Apple Developer team ID."
   if [ -f Local.xcconfig ]; then
     SUGGESTED=$(awk -F'=' '/DEVELOPMENT_TEAM/ {gsub(/[ \t]/,"",$2); print $2}' Local.xcconfig)
@@ -121,7 +121,7 @@ fi
 # ─────────────── 2. APPLE_ID ───────────────
 
 if ! skip_check "APPLE_ID"; then
-  echo "── 2/7 APPLE_ID ─────────────────────────────────────────────"
+  echo "── 2/8 APPLE_ID ─────────────────────────────────────────────"
   echo "Apple ID email used for notarization (e.g. you@example.com)."
   APPLE_ID=$(ask "Apple ID")
   set_secret "APPLE_ID" "$APPLE_ID"
@@ -131,7 +131,7 @@ fi
 # ─────────────── 3. APPLE_APP_SPECIFIC_PASSWORD ───────────────
 
 if ! skip_check "APPLE_APP_SPECIFIC_PASSWORD"; then
-  echo "── 3/7 APPLE_APP_SPECIFIC_PASSWORD ──────────────────────────"
+  echo "── 3/8 APPLE_APP_SPECIFIC_PASSWORD ──────────────────────────"
   echo "Generate at https://appleid.apple.com → Sign-In and Security"
   echo "→ App-Specific Passwords → '+' → label it 'Catty release'."
   echo "Looks like: abcd-efgh-ijkl-mnop"
@@ -143,7 +143,7 @@ fi
 # ─────────────── 4. APPLE_SIGNING_IDENTITY ───────────────
 
 if ! skip_check "APPLE_SIGNING_IDENTITY"; then
-  echo "── 4/7 APPLE_SIGNING_IDENTITY ───────────────────────────────"
+  echo "── 4/8 APPLE_SIGNING_IDENTITY ───────────────────────────────"
   echo "Full string of your Developer ID Application cert."
   echo "Available identities in your keychain:"
   security find-identity -v -p codesigning 2>/dev/null \
@@ -158,7 +158,7 @@ fi
 # ─────────────── 5. APPLE_CERTIFICATE_BASE64 + PASSWORD ───────────────
 
 if ! skip_check "APPLE_CERTIFICATE_BASE64"; then
-  echo "── 5/7 APPLE_CERTIFICATE_BASE64 + APPLE_CERTIFICATE_PASSWORD ──"
+  echo "── 5/8 APPLE_CERTIFICATE_BASE64 + APPLE_CERTIFICATE_PASSWORD ──"
   echo "The Developer ID Application cert exported from Keychain Access"
   echo "as a .p12 file (right-click cert → Export… → .p12 → set a password)."
   echo
@@ -176,10 +176,22 @@ if ! skip_check "APPLE_CERTIFICATE_BASE64"; then
   echo
 fi
 
-# ─────────────── 6. LOCAL_XCCONFIG_BASE64 ───────────────
+# ─────────────── 6. SPARKLE_PRIVATE_KEY ───────────────
+
+if ! skip_check "SPARKLE_PRIVATE_KEY"; then
+  echo "── 6/8 SPARKLE_PRIVATE_KEY ─────────────────────────────────"
+  echo "Sparkle EdDSA private key used to sign the direct-download"
+  echo "appcast. Generate with scripts/generate-sparkle-key.sh or"
+  echo "Sparkle's generate_keys tool; do not commit it."
+  SPARKLE_KEY=$(ask_secret "Sparkle private key")
+  set_secret "SPARKLE_PRIVATE_KEY" "$SPARKLE_KEY"
+  echo
+fi
+
+# ─────────────── 7. LOCAL_XCCONFIG_BASE64 ───────────────
 
 if ! skip_check "LOCAL_XCCONFIG_BASE64"; then
-  echo "── 6/7 LOCAL_XCCONFIG_BASE64 ────────────────────────────────"
+  echo "── 7/8 LOCAL_XCCONFIG_BASE64 ────────────────────────────────"
   echo "Your Local.xcconfig (DEVELOPMENT_TEAM + BUNDLE_ID_PREFIX +"
   echo "SPARKLE_ED_PUBLIC_KEY). Reads from ./Local.xcconfig by default."
   if [ -f Local.xcconfig ]; then
@@ -197,10 +209,10 @@ if ! skip_check "LOCAL_XCCONFIG_BASE64"; then
   echo
 fi
 
-# ─────────────── 7. (optional) APP_ID + APP_PRIVATE_KEY ───────────────
+# ─────────────── 8. (optional) APP_ID + APP_PRIVATE_KEY ───────────────
 
 if ! skip_check "APP_ID"; then
-  echo "── 7/7 (optional) APP_ID + APP_PRIVATE_KEY ──────────────────"
+  echo "── 8/8 (optional) APP_ID + APP_PRIVATE_KEY ──────────────────"
   echo "GitHub App credentials so the release workflow can publish to"
   echo "catty3d-site, bump homebrew-catty3d, and fast-forward main."
   echo "Without these, the workflow still builds + signs + notarizes"

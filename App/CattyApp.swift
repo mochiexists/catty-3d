@@ -7,10 +7,21 @@
 //
 
 import Catty
+#if !APPSTORE_BUILD
+import Sparkle
+#endif
 import SwiftUI
 
 @main
 struct CattyApp: App {
+#if !APPSTORE_BUILD
+    private let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
+#endif
+
     init() {
         // Honour `--catty-preset=<name>` launch args from Fastlane /
         // UI tests so the cold-start scene matches the screenshot
@@ -27,6 +38,14 @@ struct CattyApp: App {
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .newItem) {}
+#if !APPSTORE_BUILD
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates...") {
+                    updaterController.updater.checkForUpdates()
+                }
+                .disabled(!updaterController.updater.canCheckForUpdates)
+            }
+#endif
         }
     }
 }

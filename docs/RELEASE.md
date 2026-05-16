@@ -1,8 +1,7 @@
 # Catty release pipeline
 
-> Status: scaffolding in place, no signed builds yet. This document
-> describes the pipeline as it will be once secrets + signing identity
-> are wired. Update it as each piece lands.
+> Status: direct-download Sparkle wiring is in place. Signed release
+> runs still require GitHub Actions secrets and Apple signing material.
 
 Catty ships through two channels, mirroring Local AI Cat's split:
 
@@ -63,10 +62,10 @@ and Security → App-Specific Passwords.
 
 ### Sparkle EdDSA keypair (for Outdoor auto-update)
 
-Generate once with Sparkle's `generate_keys` tool. The **public** key
-goes in `Local.xcconfig` (`SPARKLE_ED_PUBLIC_KEY`); the **private**
-key stays in macOS Keychain on whichever machine runs the release
-pipeline (typically a CI runner).
+Generate once with Sparkle's `generate_keys` tool or
+`scripts/generate-sparkle-key.sh`. The **public** key goes in
+`Local.xcconfig` (`SPARKLE_ED_PUBLIC_KEY`); the **private** key is
+stored as the `SPARKLE_PRIVATE_KEY` GitHub Actions secret.
 
 ---
 
@@ -117,7 +116,7 @@ others fall back to the primary locale.
 
 ## CI release flow (when wired)
 
-Triggered by a tag push to `mochiexists/catty`:
+Triggered by a tag push to `mochiexists/catty-3d`:
 
 ```
 git tag release/v0.1.0+1
