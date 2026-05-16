@@ -80,6 +80,7 @@ permissions:
 env:
   PROJECT: "Catty.xcodeproj"
   SCHEME: "CattyApp"
+  GITHUB_APP_ID: ${{ secrets.APP_ID }}
   PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 jobs:
@@ -396,17 +397,17 @@ jobs:
           retention-days: 30
 
       - name: Mint cross-repo token
-        if: ${{ secrets.APP_ID != '' }}
+        if: ${{ env.GITHUB_APP_ID != '' }}
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.APP_ID }}
+          app-id: ${{ env.GITHUB_APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: mochiexists
           repositories: catty3d-site,homebrew-catty3d
 
       - name: Publish to catty3d-site
-        if: ${{ secrets.APP_ID != '' }}
+        if: ${{ env.GITHUB_APP_ID != '' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
@@ -432,7 +433,7 @@ jobs:
           echo "Published to https://github.com/$SITE_REPO/releases/tag/v${RELEASE_VERSION}"
 
       - name: Update Homebrew cask
-        if: ${{ secrets.APP_ID != '' }}
+        if: ${{ env.GITHUB_APP_ID != '' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
@@ -492,22 +493,22 @@ jobs:
           fi
 
       - name: Mint installation token
-        if: ${{ secrets.APP_ID != '' }}
+        if: ${{ env.GITHUB_APP_ID != '' }}
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.APP_ID }}
+          app-id: ${{ env.GITHUB_APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - uses: actions/checkout@v5
-        if: ${{ secrets.APP_ID != '' }}
+        if: ${{ env.GITHUB_APP_ID != '' }}
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Fast-forward main from outdoor-cat
-        if: ${{ secrets.APP_ID != '' }}
+        if: ${{ env.GITHUB_APP_ID != '' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           GH_REPO:  ${{ github.repository }}
