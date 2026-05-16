@@ -71,8 +71,6 @@ on:
   push:
     tags:
       - "release/v*+*"
-    branches-ignore:
-      - "**"
 
 permissions:
   contents: read

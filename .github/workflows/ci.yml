@@ -55,6 +55,9 @@ jobs:
       - name: Install XcodeGen + xcbeautify
         run: brew install xcodegen xcbeautify
 
+      - name: Materialize unsigned local config
+        run: cp Local.example.xcconfig Local.xcconfig
+
       - name: Generate project
         run: xcodegen generate
 
