@@ -250,6 +250,12 @@ jobs:
             find "$ARCHIVE_PATH" -maxdepth 6 -print || true
             exit 1
           fi
+          RELEASE_APP_PATH="$(dirname "$APP_PATH")/Catty.app"
+          if [ "$APP_PATH" != "$RELEASE_APP_PATH" ]; then
+            rm -rf "$RELEASE_APP_PATH"
+            mv "$APP_PATH" "$RELEASE_APP_PATH"
+            APP_PATH="$RELEASE_APP_PATH"
+          fi
           APP_BUNDLE_NAME="$(basename "$APP_PATH")"
           echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
           echo "APP_BUNDLE_NAME=$APP_BUNDLE_NAME" >> "$GITHUB_ENV"
