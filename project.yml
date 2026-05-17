@@ -83,7 +83,7 @@ packages:
   # The Catty SwiftPM package lives in THIS repo (Sources/Catty/* +
   # Package.swift at the root). XcodeGen treats a `path: "."` package
   # reference as "this directory holds a Package.swift" and consumes
-  # the `Catty` library product from it. The standalone Catty.app
+  # the `Catty` library product from it. The standalone CattyApp.app
   # target then depends on that local product — same wiring you'd
   # use for any vendored SPM package.
   Catty:
@@ -140,7 +140,8 @@ targetTemplates:
 #
 # Module names (the target keys) are CattyApp / CattyAppStore so they
 # don't collide with the SwiftPM package's `Catty` module. PRODUCT_NAME
-# stays `Catty`, so the built bundle is still `Catty.app`.
+# stays target-derived for UI tests; the release workflow renames the
+# shipped direct-download bundle to `Catty 3D.app`.
 targets:
   # ============================================================================
   # MARK: - macOS Outdoor (Direct Download)

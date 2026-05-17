@@ -7,7 +7,7 @@ Produces dmg-assets/background.png (540x380) and background@2x.png
 Applications icon here; create-dmg renders those on top.
 
   icon-size     : 100
-  Catty.app     : (130, 190)  → icon center ≈ (180, 240)
+  Catty 3D.app  : (130, 190)  → icon center ≈ (180, 240)
   Applications  : (410, 190)  → icon center ≈ (460, 240)
 
 Palette pulled from the app icon: deep indigo-violet space ground,

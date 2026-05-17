@@ -250,7 +250,7 @@ jobs:
             find "$ARCHIVE_PATH" -maxdepth 6 -print || true
             exit 1
           fi
-          RELEASE_APP_PATH="$(dirname "$APP_PATH")/Catty.app"
+          RELEASE_APP_PATH="$(dirname "$APP_PATH")/Catty 3D.app"
           if [ "$APP_PATH" != "$RELEASE_APP_PATH" ]; then
             rm -rf "$RELEASE_APP_PATH"
             mv "$APP_PATH" "$RELEASE_APP_PATH"
