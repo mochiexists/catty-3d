@@ -265,17 +265,23 @@ jobs:
 
           SIGN="codesign --force --options runtime --timestamp --generate-entitlement-der --sign"
 
-          # Sign nested frameworks/dylibs (none today, but keep
-          # the loop so future deps just work).
+          # Sign nested code before the app. Sparkle ships helper apps,
+          # XPC services, and standalone tools inside its framework; all
+          # must carry a Developer ID timestamp for notarization.
           if [ -d "$APP_PATH/Contents/Frameworks" ]; then
-            find "$APP_PATH/Contents/Frameworks" -maxdepth 1 -name "*.dylib" -print0 2>/dev/null \
-              | while IFS= read -r -d '' item; do
+            while IFS= read -r -d '' item; do
+              if file "$item" | grep -q 'Mach-O'; then
                 $SIGN "$APPLE_SIGNING_IDENTITY" "$item"
-              done
-            for fw in "$APP_PATH/Contents/Frameworks"/*.framework; do
-              [ -e "$fw" ] || continue
+              fi
+            done < <(find "$APP_PATH/Contents/Frameworks" -type f -perm -111 -print0)
+
+            while IFS= read -r -d '' fw; do
               $SIGN "$APPLE_SIGNING_IDENTITY" "$fw"
-            done
+            done < <(
+              find "$APP_PATH/Contents/Frameworks" -type d \
+                \( -name "*.framework" -o -name "*.app" -o -name "*.xpc" \) -print0 \
+                | python3 -c 'import sys; items = [item for item in sys.stdin.buffer.read().split(b"\0") if item]; items.sort(key=lambda item: item.count(b"/"), reverse=True); sys.stdout.buffer.write(b"\0".join(items) + (b"\0" if items else b""))'
+            )
           fi
 
           # Sign the main app with entitlements.
