@@ -243,11 +243,11 @@ jobs:
       - name: Resolve archived app
         run: |
           set -euo pipefail
-          APP_DIR="$RUNNER_TEMP/Catty.xcarchive/Products/Applications"
-          APP_PATH="$(find "$APP_DIR" -maxdepth 1 -type d -name "*.app" -print -quit)"
+          ARCHIVE_PATH="$RUNNER_TEMP/Catty.xcarchive"
+          APP_PATH="$(find "$ARCHIVE_PATH" -type d -name "*.app" ! -path "*/dSYMs/*" -print -quit)"
           if [ -z "$APP_PATH" ]; then
-            echo "::error::No .app bundle found in $APP_DIR"
-            find "$RUNNER_TEMP/Catty.xcarchive" -maxdepth 4 -print || true
+            echo "::error::No .app bundle found in $ARCHIVE_PATH"
+            find "$ARCHIVE_PATH" -maxdepth 6 -print || true
             exit 1
           fi
           APP_BUNDLE_NAME="$(basename "$APP_PATH")"
