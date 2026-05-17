@@ -3,9 +3,9 @@
 # Tag-driven release pipeline for the Outdoor (Direct Download) channel
 # of Catty. Mirrors the structure used by Local AI Cat:
 #
-#   * Trigger: tag push of `release/v*`; the `+N` build suffix is
-#     validated in shell because GitHub Actions tag globs treat `+`
-#     inconsistently.
+#   * Trigger: tag push of `release/v*`; when the tag uses the
+#     `release/vX.Y.Z+N` form, the `+N` build suffix is validated in
+#     shell because GitHub Actions tag globs treat `+` inconsistently.
 #     OR manual workflow_dispatch (with optional auto-bumped build N).
 #   * Validate the build number is strictly greater than the highest
 #     previous successful release.
@@ -43,7 +43,7 @@
 #
 # OSS-safety properties (Catty is a public repo):
 #
-#   * Triggers ONLY on `push: tags: release/v*+*` and `workflow_dispatch`.
+#   * Triggers ONLY on `push: tags: release/v*` and `workflow_dispatch`.
 #     Both require write access to the repo, so PR contributors from forks
 #     cannot fire this workflow OR see any of the secrets it reads.
 #   * Never uses `pull_request_target` or any trigger that runs untrusted
@@ -474,8 +474,9 @@ jobs:
           /usr/bin/sed -i '' "s/version \".*\"/version \"${RELEASE_VERSION}\"/" /tmp/cask.rb
           /usr/bin/sed -i '' "s/sha256 :no_check.*$/sha256 \"${SHA}\"/" /tmp/cask.rb
           /usr/bin/sed -i '' "s/sha256 \".*\"/sha256 \"${SHA}\"/" /tmp/cask.rb
+          /usr/bin/sed -i '' 's/app ".*"/app "Catty 3D.app"/' /tmp/cask.rb
 
-          CONTENT_B64=$(base64 < /tmp/cask.rb)
+          CONTENT_B64=$(base64 < /tmp/cask.rb | tr -d '\n')
           FILE_SHA=$(gh api "repos/$TAP_REPO/contents/Casks/catty.rb" --jq '.sha')
 
           gh api -X PUT "repos/$TAP_REPO/contents/Casks/catty.rb" \

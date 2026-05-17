@@ -3,10 +3,8 @@
 A 3D terminal experience for macOS (and soon iOS). Your shell, but framed
 inside a RealityKit scene with orbiting companions. Open-source, MIT.
 
-> Status: pre-release scaffolding. The Catty SwiftPM package lives in-tree
-> at `local-ai-cat/Local-AI-Chat:Local AI Chat/Features/Compute/Terminal3D/CattyPackage/`
-> until it's ready to extract to `mochiexists/catty`. This repo is the
-> staging ground for the standalone app that ships alongside the package.
+> Status: direct-download macOS releases ship through GitHub Actions as
+> signed, notarized DMGs with Sparkle appcasts. See `docs/RELEASE.md`.
 
 ## Run locally (developer-only, today)
 
@@ -38,7 +36,7 @@ overrides:
 - `BUNDLE_ID_PREFIX`  — reverse-DNS namespace you own; used as
   `$(BUNDLE_ID_PREFIX).Catty`, `$(BUNDLE_ID_PREFIX).Catty.AppStore`, etc.
 - `SPARKLE_ED_PUBLIC_KEY` — public half of the Sparkle update key
-  (private half lives only in macOS Keychain on the release runner)
+  (private half lives in the `SPARKLE_PRIVATE_KEY` GitHub Actions secret)
 
 CI passes these via env vars / secrets, not from `Local.xcconfig`.
 
