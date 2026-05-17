@@ -492,15 +492,33 @@ public struct Terminal3DSceneView: View {
 
     /// Install an app-level scroll-wheel monitor so zoom works
     /// regardless of which view has keyboard focus.
-    /// • Plain scroll  → consumed, drives camera zoom.
-    /// • ⌥-scroll      → passed through; SwiftTerm sees it and
+    /// • Plain scroll  → consumed, drives camera zoom (default), OR
+    ///   passed through to SwiftTerm for terminal scrollback when the
+    ///   host app sets `compute.catty.trackpadScrollZoom` to `false`.
+    /// • ⌥-scroll      → always passed through; SwiftTerm sees it and
     ///   uses it for terminal scrollback.
+    ///
+    /// The flag is read live (per event) from `UserDefaults.standard`
+    /// so the host app's toggle takes effect without reinstalling the
+    /// monitor. It defaults to `true` (scroll zooms) when unset, so
+    /// existing behaviour is unchanged unless the host opts out.
     @MainActor
     private func installScrollMonitor() {
         guard scrollMonitor == nil else { return }
         scrollMonitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
             // ⌥-scroll: terminal scrollback — let it bubble to SwiftTerm.
             if event.modifierFlags.contains(.option) {
+                return event
+            }
+            // Host app opted plain scroll out of zoom: let it through to
+            // SwiftTerm (scrollback). Zoom stays available via the
+            // on-screen zoom bar.
+            let defaults = UserDefaults.standard
+            let scrollZoomKey = "compute.catty.trackpadScrollZoom"
+            let scrollZooms = defaults.object(forKey: scrollZoomKey) == nil
+                ? true
+                : defaults.bool(forKey: scrollZoomKey)
+            if !scrollZooms {
                 return event
             }
             // Plain scroll: zoom. Same per-tick math as the old in-tree
