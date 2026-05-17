@@ -240,12 +240,27 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             -skipPackagePluginValidation
 
+      - name: Resolve archived app
+        run: |
+          set -euo pipefail
+          APP_DIR="$RUNNER_TEMP/Catty.xcarchive/Products/Applications"
+          APP_PATH="$(find "$APP_DIR" -maxdepth 1 -type d -name "*.app" -print -quit)"
+          if [ -z "$APP_PATH" ]; then
+            echo "::error::No .app bundle found in $APP_DIR"
+            find "$RUNNER_TEMP/Catty.xcarchive" -maxdepth 4 -print || true
+            exit 1
+          fi
+          APP_BUNDLE_NAME="$(basename "$APP_PATH")"
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+          echo "APP_BUNDLE_NAME=$APP_BUNDLE_NAME" >> "$GITHUB_ENV"
+          echo "Archived app: $APP_PATH"
+
       - name: Sign with Developer ID
         env:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
           set -euo pipefail
-          APP_PATH="$RUNNER_TEMP/Catty.xcarchive/Products/Applications/Catty.app"
+          : "${APP_PATH:?APP_PATH missing}"
           ENTITLEMENTS="Entitlements/DirectDownload.entitlements"
 
           SIGN="codesign --force --options runtime --timestamp --generate-entitlement-der --sign"
@@ -277,7 +292,7 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
           set -euo pipefail
-          APP_PATH="$RUNNER_TEMP/Catty.xcarchive/Products/Applications/Catty.app"
+          : "${APP_PATH:?APP_PATH missing}"
           mkdir -p build/direct
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" build/direct/Catty-notary.zip
 
@@ -306,7 +321,7 @@ jobs:
       - name: Smoke-test launch
         run: |
           set -euo pipefail
-          APP_PATH="$RUNNER_TEMP/Catty.xcarchive/Products/Applications/Catty.app"
+          : "${APP_PATH:?APP_PATH missing}"
           BUNDLE_ID="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Contents/Info.plist")"
           open -n "$APP_PATH" || true
           sleep 6
@@ -330,7 +345,8 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
           set -euo pipefail
-          APP_PATH="$RUNNER_TEMP/Catty.xcarchive/Products/Applications/Catty.app"
+          : "${APP_PATH:?APP_PATH missing}"
+          : "${APP_BUNDLE_NAME:?APP_BUNDLE_NAME missing}"
           DMG_NAME="Catty-${RELEASE_VERSION}.dmg"
 
           DMG_STAGE="$RUNNER_TEMP/dmg-stage"
@@ -345,9 +361,9 @@ jobs:
             --window-pos 200 120 \
             --window-size 540 380 \
             --icon-size 100 \
-            --icon "Catty.app" 130 190 \
+            --icon "$APP_BUNDLE_NAME" 130 190 \
             --app-drop-link 410 190 \
-            --hide-extension "Catty.app" \
+            --hide-extension "$APP_BUNDLE_NAME" \
             --no-internet-enable \
             "build/direct/$DMG_NAME" \
             "$DMG_STAGE"
