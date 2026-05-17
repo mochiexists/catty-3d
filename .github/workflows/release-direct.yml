@@ -79,7 +79,7 @@ permissions:
 
 env:
   PROJECT: "Catty.xcodeproj"
-  SCHEME: "CattyApp"
+  SCHEME: "Catty"
   GITHUB_APP_ID: ${{ secrets.APP_ID }}
   PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
