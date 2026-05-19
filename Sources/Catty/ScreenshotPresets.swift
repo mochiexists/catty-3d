@@ -97,12 +97,41 @@ public enum ScreenshotPreset: String, CaseIterable {
 }
 
 public enum ScreenshotPresetLauncher {
+    /// Initial camera zoom from `--catty-zoom=<double>` (orthogonal to
+    /// the layout preset). Consulted by `Terminal3DSceneView`'s
+    /// `@State zoom` default. `nil` → the normal 1.0 default.
+    public static private(set) var initialZoom: Double?
+
+    /// Initial origin-pane surface from `--catty-surface=<mode>`
+    /// (`flat`/`curved`/`mobius`/`warp`). Consulted by the
+    /// `@State surfaceModes` default. `nil` → flat.
+    public static private(set) var initialSurfaceModes: [PaneSlot: TerminalSurfaceMode]?
+
     /// Read the current process's launch args and apply any
-    /// `--catty-preset=<name>` directive. Called from CattyApp's
-    /// init() so the persisted layout is in place before
-    /// Terminal3DSceneView reads it.
+    /// `--catty-preset=<name>`, `--catty-zoom=<double>`, and
+    /// `--catty-surface=<mode>` directives. Called from CattyApp's
+    /// init() so layout/zoom/surface are in place before
+    /// Terminal3DSceneView reads them. The three are independent so a
+    /// parity-capture matrix can vary them orthogonally.
     public static func applyFromLaunchArgs() {
         let args = ProcessInfo.processInfo.arguments
+
+        if let zoomArg = args.first(where: { $0.hasPrefix("--catty-zoom=") }),
+           let value = Double(zoomArg.dropFirst("--catty-zoom=".count)) {
+            initialZoom = value
+            print("📸 Screenshot zoom: \(value)")
+        }
+
+        if let surfArg = args.first(where: { $0.hasPrefix("--catty-surface=") }) {
+            let name = String(surfArg.dropFirst("--catty-surface=".count))
+            if let mode = TerminalSurfaceMode(rawValue: name) {
+                initialSurfaceModes = [.origin: mode]
+                print("📸 Screenshot surface: \(mode.rawValue)")
+            } else {
+                print("⚠️ Unknown screenshot surface: \(name)")
+            }
+        }
+
         guard let arg = args.first(where: { $0.hasPrefix("--catty-preset=") }) else {
             return
         }

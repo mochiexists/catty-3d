@@ -1,0 +1,58 @@
+# visual-parity.yml — on-demand before/after renderer screenshot diff.
+#
+# Runs Scripts/visual-parity.sh on a macOS runner (it has a window
+# server, so XCUITest can capture the RealityKit scene). Compares the
+# current branch's rendering against a baseline ref using the
+# deterministic parity tests. Manual (workflow_dispatch) because UI-test
+# runs are minutes-long and GPU-bound — opt-in per refactor PR.
+#
+# The baseline ref must contain the parity harness (deterministic mode
+# + CattyParityUITests); the script errors clearly otherwise.
+#
+# Inputs flow through env: (not inline ${{ }} in run:) per GitHub's
+# Actions injection guidance.
+
+name: Visual Parity
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: "Git ref to compare the current branch against"
+        required: true
+        default: "origin/main"
+      threshold:
+        description: "Max changed-pixel %% before FAIL"
+        required: false
+        default: "0.10"
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install tooling
+        run: brew install xcodegen imagemagick
+
+      - name: Run visual parity
+        env:
+          BASELINE_REF: ${{ inputs.baseline_ref }}
+          THRESHOLD: ${{ inputs.threshold }}
+        run: Scripts/visual-parity.sh "$BASELINE_REF" --threshold "$THRESHOLD"
+
+      - name: Upload diffs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-parity-diffs
+          path: .parity/diff/
+          retention-days: 14
+          if-no-files-found: ignore

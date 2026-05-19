@@ -38,6 +38,20 @@ jobs:
       - name: Run SwiftLint
         run: swiftlint lint --quiet --reporter github-actions-logging
 
+  unit-tests:
+    runs-on: macos-26
+    needs: lint
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      # Closes the long-standing gap: the SPM unit + perf-baseline
+      # suite (CattyTests) previously never ran in CI. The perf cases
+      # also print the capture-hot-path baseline on every run.
+      - name: Run swift test
+        run: swift test --disable-sandbox
+
   build:
     runs-on: macos-26
     needs: lint

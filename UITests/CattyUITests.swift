@@ -57,10 +57,12 @@ final class CattyUITests: XCTestCase {
 
     // MARK: - Helpers
 
+    /// App Store marketing capture — the LIVE scene (animated orbit,
+    /// starfield, real shell). Deliberately NOT deterministic: the
+    /// hero shots want the pretty moving scene.
     private func launch(preset: String) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["SCREENSHOT_MODE"] = "1"
-        app.launchEnvironment["CATTY_DETERMINISTIC_RENDER"] = "1"
         app.launchArguments += ["--catty-preset=\(preset)"]
         app.launch()
         return app

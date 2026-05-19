@@ -142,6 +142,15 @@ public final class TerminalLiveTextureSource {
         switch mode {
         case .local:
             guard let view = terminalView as? LocalProcessTerminalView else { return }
+            // Deterministic mode: never spawn the user's live zsh
+            // (prompt/cwd/timestamps aren't reproducible). Feed a
+            // fixed fixture so the captured texture is byte-stable
+            // for before/after screenshot parity.
+            if DeterministicRender.isOn {
+                view.feed(byteArray: ArraySlice(Array(DeterministicRender.terminalFixture.utf8)))
+                startCaptureLoop()
+                return
+            }
             let shell = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
             // chdir before spawn so the forked shell inherits that cwd —
             // without this, Catty's local terminal lands in `/` (the

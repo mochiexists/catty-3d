@@ -18,6 +18,29 @@ shippable. Effort: S = <½ day · M = ~1 day · L = 2–3 days.
   numbers pre-extraction), `ConnectionStateMappingTests` (locks the
   transport-neutral SSH state map).
 - SwiftLint scoped to `App` + `Tests` + `UITests` (0 violations).
+- **Visual-parity harness — the Phase-2 safety net.** Unit tests can't
+  see a wrong mesh / misplaced pane / broken texture binding; this
+  closes that gap:
+  - `DeterministicRender` (`CATTY_DETERMINISTIC_RENDER=1`): freezes
+    orbit/cursor-cat/Maxwell (reuses `freezeOrbiters`), hides the
+    random starfield, feeds a fixed terminal fixture. Zero release
+    impact (no-op unless the env var is set).
+  - `--catty-zoom=` / `--catty-surface=` launch args (orthogonal to
+    `--catty-preset=`) so the matrix varies camera + mesh + layout.
+  - `CattyParityUITests` — 7 deterministic shots (default / zoom-in /
+    zoom-out / curved / möbius / warp / multi-pane).
+  - `Scripts/visual-parity.sh BASELINE_REF` — builds+captures the
+    baseline ref in an isolated git worktree vs the working tree,
+    perceptual-diffs each pair (ImageMagick AE, 2% fuzz), fails over
+    a changed-pixel threshold. Diffs in `.parity/diff/`.
+  - CI: `unit-tests` job runs `swift test` on every push/PR;
+    `visual-parity.yml` (workflow_dispatch) runs the diff per
+    refactor PR and uploads the diffs.
+  - **Usage for the refactor:** branch off `main` (now has the
+    harness), do the Phase-2 work, run `Scripts/visual-parity.sh main`
+    — both sides have deterministic mode, so any non-zero diff is a
+    real rendering regression. App Store marketing screenshots are
+    unaffected (they stay on the live animated scene).
 
 ### Captured baseline (`swift test`, this machine, debug)
 

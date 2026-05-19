@@ -25,3 +25,6 @@ Local.xcconfig
 # with the file can authenticate to ASC as the issuing account.
 fastlane/*.p8
 fastlane/AuthKey_*.p8
+
+# Visual-parity working dir (Scripts/visual-parity.sh)
+.parity/

@@ -129,7 +129,7 @@ public enum CameraMode: String, CaseIterable {
 public struct Terminal3DSceneView: View {
     /// 1.0 = fully zoomed in (terminal looks flat and normal).
     /// 0.3 = fully zoomed out (orbit visible, terminal small in middle).
-    @State private var zoom: Double = 1.0
+    @State private var zoom: Double = ScreenshotPresetLauncher.initialZoom ?? 1.0
 
     /// Default to orbit because it's the right UX for a single-subject
     /// scene (the terminal). FPV is a research toggle for the future
@@ -222,7 +222,8 @@ public struct Terminal3DSceneView: View {
     /// only — different panes can sit on different shapes (flat
     /// next to curved next to mobius). Centre defaults to flat;
     /// new spawns inherit flat too.
-    @State private var surfaceModes: [PaneSlot: TerminalSurfaceMode] = [.origin: .flat]
+    @State private var surfaceModes: [PaneSlot: TerminalSurfaceMode] =
+        ScreenshotPresetLauncher.initialSurfaceModes ?? [.origin: .flat]
 
     /// Convenience: the centre pane's source. Always non-nil because
     /// centre is set in init and never removed.
@@ -827,7 +828,14 @@ public struct Terminal3DSceneView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-            .overlay(StarfieldView())
+            // The starfield is random + animated; hide it in
+            // deterministic mode so screenshot parity isn't defeated
+            // by twinkling stars.
+            .overlay {
+                if !DeterministicRender.isOn {
+                    StarfieldView()
+                }
+            }
             Terminal3DRealityScene(
                 panes: panes,
                 config: orbitConfig,
@@ -837,8 +845,8 @@ public struct Terminal3DSceneView: View {
                 panOffset: panOffset,
                 cameraMode: cameraMode,
                 surfaceModes: surfaceModes,
-                activeSlot: iconComposeMode ? nil : activeSlot,
-                freezeOrbiters: iconComposeMode
+                activeSlot: (iconComposeMode || DeterministicRender.isOn) ? nil : activeSlot,
+                freezeOrbiters: iconComposeMode || DeterministicRender.isOn
             )
         }
         .ignoresSafeArea()
