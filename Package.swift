@@ -94,6 +94,22 @@ let package = Package(
                 .product(name: "Sparkle", package: "Sparkle")
             ],
             path: "App"
+        ),
+        // Unit + performance tests. Run with `swift test`. The perf
+        // suite establishes a baseline for the terminal-capture hot
+        // path so renderer optimizations are measurable, not vibes.
+        .testTarget(
+            name: "CattyTests",
+            dependencies: [
+                "Catty",
+                // The perf suite feeds the SwiftTerm view directly to
+                // load the terminal into representative states.
+                .product(name: "SwiftTerm", package: "SwiftTerm")
+            ],
+            path: "Tests/CattyTests",
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
+            ]
         )
     ]
 )

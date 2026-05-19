@@ -281,7 +281,10 @@ extension SSHTransport: CattySSHTransporting {
     public func cattyDisconnect() { disconnect() }
 }
 
-private extension SSHTransport.ConnectionState {
+// `internal` (not `fileprivate`) so the regression test can lock this
+// 1:1 map — the OSS DRY review flagged it as load-bearing duplication
+// to guard rather than collapse.
+extension SSHTransport.ConnectionState {
     /// 1:1 map to the package's transport-neutral state.
     var cattyMapping: CattyConnectionState {
         switch self {

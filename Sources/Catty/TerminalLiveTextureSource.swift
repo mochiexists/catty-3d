@@ -326,6 +326,17 @@ public final class TerminalLiveTextureSource {
         sshTransport?.cattyDisconnect()
         sshTransport = nil
     }
+
+    #if DEBUG
+    /// Test-only: force one synchronous capture, bypassing the dirty
+    /// gate, so the performance suite can measure the real production
+    /// capture path deterministically — no spawned shell, no 30 Hz
+    /// timer. Compiled out of release builds.
+    func captureFrameForTesting() {
+        needsCapture = true
+        captureFrame()
+    }
+    #endif
 }
 
 /// Hosts the source's terminal NSView in the SwiftUI hierarchy so it

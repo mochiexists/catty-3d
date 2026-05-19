@@ -1,12 +1,20 @@
 # SwiftLint configuration for Catty.
 #
 # Philosophy mirrors Local AI Chat's: block on real issues, warn on
-# style improvements. Scope tightly to first-party Swift in `App/` and
-# `UITests/`; third-party code (SwiftTerm, Citadel, NIO, SwiftPM
-# checkouts) is excluded.
+# style improvements. Scope covers first-party Swift in `App/`,
+# `Tests/`, and `UITests/`; third-party code (SwiftTerm, Citadel, NIO,
+# SwiftPM checkouts) is excluded.
+#
+# `Sources/Catty/` is deliberately NOT linted yet: it carries 61
+# violations (5 error-level), and `swiftlint` runs as a build phase, so
+# scoping it in now would fail the app build — and several fixes require
+# touching the two 1000+ LOC monoliths. Enabling it is Phase 3 of
+# docs/planning/oss-refactor-plan.md, after decomposition, where the
+# concrete violation inventory is tracked.
 
 included:
   - App
+  - Tests
   - UITests
 
 excluded:
