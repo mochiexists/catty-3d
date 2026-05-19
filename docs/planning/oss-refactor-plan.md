@@ -29,7 +29,7 @@ shippable. Effort: S = <½ day · M = ~1 day · L = 2–3 days.
     `--catty-preset=`) so the matrix varies camera + mesh + layout.
   - `CattyParityUITests` — 7 deterministic shots (default / zoom-in /
     zoom-out / curved / möbius / warp / multi-pane).
-  - `Scripts/visual-parity.sh BASELINE_REF` — builds+captures the
+  - `scripts/visual-parity.sh BASELINE_REF` — builds+captures the
     baseline ref in an isolated git worktree vs the working tree,
     perceptual-diffs each pair (ImageMagick AE, 2% fuzz), fails over
     a changed-pixel threshold. Diffs in `.parity/diff/`.
@@ -37,7 +37,7 @@ shippable. Effort: S = <½ day · M = ~1 day · L = 2–3 days.
     `visual-parity.yml` (workflow_dispatch) runs the diff per
     refactor PR and uploads the diffs.
   - **Usage for the refactor:** branch off `main` (now has the
-    harness), do the Phase-2 work, run `Scripts/visual-parity.sh main`
+    harness), do the Phase-2 work, run `scripts/visual-parity.sh main`
     — both sides have deterministic mode, so any non-zero diff is a
     real rendering regression. App Store marketing screenshots are
     unaffected (they stay on the live animated scene).

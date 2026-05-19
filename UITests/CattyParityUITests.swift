@@ -4,7 +4,7 @@
 //  Deterministic screenshot matrix for before/after VISUAL PARITY.
 //  Every test launches with `CATTY_DETERMINISTIC_RENDER=1` so the
 //  scene is frozen + starless + fed a fixed terminal fixture — the
-//  capture is byte-stable across runs, so `Scripts/visual-parity.sh`
+//  capture is byte-stable across runs, so `scripts/visual-parity.sh`
 //  can diff baseline vs working-tree and a difference means the
 //  rendering ACTUALLY changed (the safety net for the Phase-2
 //  renderer decomposition in docs/planning/oss-refactor-plan.md).
