@@ -189,7 +189,7 @@ jobs:
         run: xcodegen generate
 
       - name: Cache SPM checkouts + DerivedData
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
@@ -418,7 +418,7 @@ jobs:
             ./scripts/sparkle_generate_appcast.sh "$DMG_PATH" "v${RELEASE_VERSION}" build/direct/appcast.xml
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: direct-release-${{ env.RELEASE_VERSION }}-${{ env.RELEASE_BUILD }}
           path: |
