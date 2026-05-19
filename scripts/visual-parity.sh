@@ -60,23 +60,45 @@ trap cleanup EXIT
 rm -rf "$WORK"
 mkdir -p "$WORK/baseline" "$WORK/current" "$WORK/diff"
 
+# Sandbox-redirected fallback path the XCUITest runner actually writes
+# to (TCC blocks ~/Library/Caches; the sandbox lands writes in this
+# container path instead — mirrors fastlane/Fastfile screenshots lane).
+SANDBOX_CACHE="$HOME/Library/Containers/mochiexists.Catty.UITests.xctrunner/Data/Library/Caches/tools.fastlane/screenshots-macos"
+
 # A run = generate project, ensure unsigned local config, run the
-# deterministic parity test class, collecting PNGs into $1.
+# deterministic parity test class, collecting PNGs into $1. xcodebuild
+# stdout streams to the log on success and is replayed on failure so a
+# misconfig is debuggable, not silent.
 run_capture() {
   local out_dir="$1" src_dir="$2" label="$3"
+  local log="$WORK/xcodebuild-$(basename "$out_dir").log"
   echo "▶ Capturing $label ($src_dir)"
-  ( cd "$src_dir"
-    [ -f Local.xcconfig ] || cp Local.example.xcconfig Local.xcconfig
-    xcodegen generate >/dev/null
-    SNAPSHOT_MAC_OUTPUT_DIR="$out_dir" \
-      xcodebuild test \
-        -project Catty.xcodeproj \
-        -scheme "$SCHEME" \
-        -configuration Debug \
-        -destination 'platform=macOS' \
-        CODE_SIGNING_ALLOWED=NO \
-        $ONLY >/dev/null 2>&1 ) \
-    || { echo "::error::parity test run failed for $label"; exit 1; }
+  # `CODE_SIGNING_ALLOWED=NO` is fine for build-only but breaks UI
+  # tests: the runner can't launch an unsigned .app and reports the
+  # misleading "bundle identifier ... couldn't be read" error. Let
+  # Xcode adhoc-sign by default.
+  rm -rf "$SANDBOX_CACHE"
+  if ! ( cd "$src_dir"
+        [ -f Local.xcconfig ] || cp Local.example.xcconfig Local.xcconfig
+        xcodegen generate >/dev/null
+        SNAPSHOT_MAC_OUTPUT_DIR="$out_dir" \
+          xcodebuild test \
+            -project Catty.xcodeproj \
+            -scheme "$SCHEME" \
+            -destination 'platform=macOS' \
+            $ONLY ); then
+    echo "::error::parity test run failed for $label — tail of log:"
+    tail -30 "$log" 2>/dev/null || true
+    exit 1
+  fi >"$log" 2>&1
+
+  # SNAPSHOT_MAC_OUTPUT_DIR is honored by CattyParityUITests.capture,
+  # but the macOS sandbox can redirect that write into the runner's
+  # container. Sweep the container path into $out_dir so the diff sees
+  # the PNGs regardless of where they actually landed.
+  if [ -d "$SANDBOX_CACHE" ]; then
+    find "$SANDBOX_CACHE" -name 'parity_*.png' -exec mv {} "$out_dir/" \;
+  fi
   local n; n=$(find "$out_dir" -name 'parity_*.png' | wc -l | tr -d ' ')
   [ "$n" -gt 0 ] || { echo "::error::$label produced no parity_*.png"; exit 1; }
   echo "  $n shots"
