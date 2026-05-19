@@ -378,6 +378,15 @@ public struct Terminal3DSceneView: View {
     /// How far the rat button moves the camera per click — 2 zoom steps.
     private let ratZoomOutDelta: Double = 0.2
 
+    /// Extra top inset for the right-side rail so it clears the host
+    /// window's native control band. When Catty is embedded in a
+    /// `Window(id:)` scene (e.g. Local AI Chat) the macOS traffic-light /
+    /// full-screen control and the window's rounded-corner mask occupy
+    /// the top ~28pt; without this the rail collides with — and is
+    /// clipped by — that chrome. Standalone Catty.app is unaffected
+    /// visually (its rail simply starts a touch lower).
+    private let windowChromeTopInset: CGFloat = 28
+
     public var body: some View {
         ZStack {
             spaceBackground
@@ -870,6 +879,10 @@ public struct Terminal3DSceneView: View {
                     ratFloatingButton
                 }
             }
+            // Push the rail below the host window's native control band
+            // (traffic lights / full-screen pill) and rounded-corner mask
+            // so it isn't clipped when Catty is embedded in a Window scene.
+            .padding(.top, windowChromeTopInset)
             Spacer()
         }
     }
