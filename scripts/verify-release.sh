@@ -96,16 +96,20 @@ ish=$(gh api "repos/${SITE_REPO}/contents/public/install.sh" --jq '.content' 2>/
 if [ -z "$ish" ]; then
   fail "install.sh not found in $SITE_REPO"
 else
-  ISH_REPO=$(echo "$ish" | grep -E '^REPO=' | head -1 | sed -E 's/^REPO="?([^"#]+)"?.*/\1/' | tr -d ' ')
+  ISH_REPO=$(echo "$ish" | grep -E '^REPO=' | head -1 | sed -E 's/^REPO="?([^"#]+)"?.*/\1/' | tr -d ' ' || true)
   [ "$ISH_REPO" = "$SITE_REPO" ] \
     && pass "install.sh REPO = $SITE_REPO" \
     || fail "install.sh REPO '$ISH_REPO' != '$SITE_REPO'"
 
-  # Resolve exactly as install.sh does: the first .dmg
-  # browser_download_url on the latest release.
-  rel=$(curl -fsSL "https://api.github.com/repos/${SITE_REPO}/releases/latest" 2>/dev/null || true)
-  ISH_TAG=$(printf '%s' "$rel" | awk -F'"' '/^[[:space:]]*"tag_name":/ {print $4; exit}')
-  ISH_URL=$(printf '%s' "$rel" | awk -F'"' '/browser_download_url/ {print $4}' | grep -i '\.dmg$' | head -1)
+  # Model install.sh's resolution — "the latest release, first asset
+  # whose URL ends in .dmg" — deterministically via `gh api --jq`.
+  # install.sh itself awk-parses the *pretty* JSON that an unauthed
+  # runtime `curl` returns; that endpoint is rate-limited from shared
+  # CI runners and an authed fetch returns *compact* JSON the awk can't
+  # read, so we assert the same resolved result format-independently.
+  ISH_TAG=$(gh api "repos/${SITE_REPO}/releases/latest" --jq '.tag_name' 2>/dev/null || true)
+  ISH_URL=$(gh api "repos/${SITE_REPO}/releases/latest" \
+    --jq '[.assets[].browser_download_url | select(test("\\.dmg$";"i"))][0] // ""' 2>/dev/null || true)
   [ "$ISH_TAG" = "$TAG" ] \
     && pass "releases/latest tag = $TAG (install.sh + cask livecheck agree)" \
     || fail "releases/latest tag '$ISH_TAG' != '$TAG'"
@@ -116,8 +120,8 @@ else
       "https://github.com/${SITE_REPO}/releases/download/"*) pass "install.sh DMG URL host/path aligned" ;;
       *) fail "install.sh DMG URL off-repo: $ISH_URL" ;;
     esac
-    icode=$(curl -s -o "$WORK/ish.dmg" -w "%{http_code}" -L --max-time 120 "$ISH_URL")
-    ISH_SHA=$(shasum -a 256 "$WORK/ish.dmg" 2>/dev/null | awk '{print $1}')
+    icode=$(curl -s -o "$WORK/ish.dmg" -w "%{http_code}" -L --max-time 120 "$ISH_URL" || true)
+    ISH_SHA=$(shasum -a 256 "$WORK/ish.dmg" 2>/dev/null | awk '{print $1}' || true)
     [ "$icode" = "200" ] && [ "$ISH_SHA" = "$DMG_SHA" ] \
       && pass "install.sh DMG == cask DMG (sha256)" \
       || fail "install.sh DMG mismatch (http=$icode sha=$ISH_SHA vs $DMG_SHA)"
