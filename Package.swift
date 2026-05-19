@@ -56,7 +56,15 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/migueldeicaza/SwiftTerm.git",
-            branch: "main"
+            // Pinned to an immutable revision, NOT `branch: "main"`.
+            // SwiftTerm has no SPM release tags, and tracking `main`
+            // means CI re-resolves to the branch tip on every run —
+            // which silently broke the build when upstream `main`
+            // drifted to a `SyncDebug` commit that doesn't compile in
+            // this configuration. This is the last revision verified
+            // green here (matches Package.resolved; 12 tests pass).
+            // Bump deliberately after testing, not implicitly.
+            revision: "432a32da04b5e8c3f8a86d776fb836ead2082745"
         ),
         .package(
             url: "https://github.com/orlandos-nl/Citadel.git",
