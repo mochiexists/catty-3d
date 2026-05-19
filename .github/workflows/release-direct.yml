@@ -17,7 +17,9 @@
 #     `mochiexists/catty3d-site` so the install pipe + brew cask resolve
 #     against /releases/latest/download/Catty.dmg.
 #   * Bump the homebrew tap cask SHA256 + version.
-#   * Auto-promote `outdoor-cat` -> `main` via a GitHub App token.
+#   * Auto-promote `outdoor-cat` -> `main` via a GitHub App token
+#     (a no-op when the optional `outdoor-cat` branch is absent, e.g.
+#     releases cut directly from `main` via workflow_dispatch).
 #
 # Required secrets (Settings → Secrets and variables → Actions):
 #
@@ -485,6 +487,12 @@ jobs:
             -f sha="$FILE_SHA"
           echo "Cask bumped to v${RELEASE_VERSION} sha=$SHA"
 
+      - name: Verify release alignment (script + brew + dmg)
+        if: ${{ env.GITHUB_APP_ID != '' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: ./scripts/verify-release.sh "$RELEASE_VERSION"
+
       - name: Summary
         run: |
           DMG_NAME="Catty-${RELEASE_VERSION}.dmg"
@@ -543,7 +551,18 @@ jobs:
           GH_REPO:  ${{ github.repository }}
         run: |
           set -euo pipefail
-          OUTDOOR_SHA=$(gh api "repos/$GH_REPO/branches/outdoor-cat" --jq '.commit.sha')
+          # `outdoor-cat` is an optional staging branch. A release cut
+          # directly from `main` (the workflow_dispatch path) has no
+          # staging branch to promote — that's a no-op, not a failure.
+          if ! OUTDOOR_SHA=$(gh api "repos/$GH_REPO/branches/outdoor-cat" --jq '.commit.sha' 2>/dev/null); then
+            echo "::notice::Branch 'outdoor-cat' not found — release was cut from main; nothing to promote."
+            exit 0
+          fi
+          MAIN_SHA=$(gh api "repos/$GH_REPO/branches/main" --jq '.commit.sha')
+          if [ "$OUTDOOR_SHA" = "$MAIN_SHA" ]; then
+            echo "main already at $OUTDOOR_SHA — nothing to promote."
+            exit 0
+          fi
           gh api "repos/$GH_REPO/git/refs/heads/main" -X PATCH \
             -f "sha=$OUTDOOR_SHA" -F "force=false" || {
               echo "::error::Fast-forward refused: main has commits not in outdoor-cat."
