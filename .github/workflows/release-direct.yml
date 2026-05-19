@@ -482,6 +482,16 @@ jobs:
           /usr/bin/sed -i '' "s/sha256 \".*\"/sha256 \"${SHA}\"/" /tmp/cask.rb
           /usr/bin/sed -i '' 's/app ".*"/app "Catty 3D.app"/' /tmp/cask.rb
 
+          # Guard against a silent sed no-op or cask-format drift: the
+          # rewrite must have actually landed the new version + sha +
+          # bundle name, or we refuse to publish a stale/broken cask.
+          grep -qE "^[[:space:]]*version \"${RELEASE_VERSION}\"" /tmp/cask.rb \
+            || { echo "::error::cask version rewrite failed (expected ${RELEASE_VERSION})"; exit 1; }
+          grep -qE "^[[:space:]]*sha256 \"${SHA}\"" /tmp/cask.rb \
+            || { echo "::error::cask sha256 rewrite failed (expected ${SHA})"; exit 1; }
+          grep -qE "^[[:space:]]*app \"Catty 3D\.app\"" /tmp/cask.rb \
+            || { echo "::error::cask app stanza rewrite failed (expected 'Catty 3D.app')"; exit 1; }
+
           CONTENT_B64=$(base64 < /tmp/cask.rb | tr -d '\n')
           FILE_SHA=$(gh api "repos/$TAP_REPO/contents/Casks/catty.rb" --jq '.sha')
 

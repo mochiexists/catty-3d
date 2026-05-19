@@ -107,12 +107,26 @@ else
   # runtime `curl` returns; that endpoint is rate-limited from shared
   # CI runners and an authed fetch returns *compact* JSON the awk can't
   # read, so we assert the same resolved result format-independently.
-  ISH_TAG=$(gh api "repos/${SITE_REPO}/releases/latest" --jq '.tag_name' 2>/dev/null || true)
-  ISH_URL=$(gh api "repos/${SITE_REPO}/releases/latest" \
-    --jq '[.assets[].browser_download_url | select(test("\\.dmg$";"i"))][0] // ""' 2>/dev/null || true)
+  # install.sh resolves via the releases/latest pointer. Run as a
+  # post-publish gate, that pointer can lag a few seconds behind the
+  # `gh release create --latest` we just did. Poll with a bounded
+  # retry so the gate tests install.sh's real path without flaking on
+  # propagation; if it never converges it's a genuine failure (latest
+  # doesn't point at this release) and we hard-fail below.
+  ISH_TAG=""; ISH_URL=""
+  for attempt in 1 2 3 4 5 6; do
+    ISH_TAG=$(gh api "repos/${SITE_REPO}/releases/latest" --jq '.tag_name' 2>/dev/null || true)
+    ISH_URL=$(gh api "repos/${SITE_REPO}/releases/latest" \
+      --jq '[.assets[].browser_download_url | select(test("\\.dmg$";"i"))][0] // ""' 2>/dev/null || true)
+    [ "$ISH_TAG" = "$TAG" ] && break
+    if [ "$attempt" -lt 6 ]; then
+      info "releases/latest = '${ISH_TAG:-<none>}', awaiting $TAG (retry $attempt/5)"
+      sleep 5
+    fi
+  done
   [ "$ISH_TAG" = "$TAG" ] \
     && pass "releases/latest tag = $TAG (install.sh + cask livecheck agree)" \
-    || fail "releases/latest tag '$ISH_TAG' != '$TAG'"
+    || fail "releases/latest tag '$ISH_TAG' != '$TAG' after retries"
   if [ -z "$ISH_URL" ]; then
     fail "install.sh would find no .dmg on releases/latest"
   else
