@@ -64,7 +64,15 @@ public final class TerminalLiveTextureSource {
         return (min(max(loc.x, 0), cols - 1), min(max(loc.y, 0), rows - 1))
     }
 
-    private var captureTimer: Timer?
+    /// Per-source rate-limiter. Replaces the old 30 Hz polling Timer:
+    /// captures are now event-driven (fire when SwiftTerm signals
+    /// dirty) and capped at 20 Hz so idle terminals cost nothing and
+    /// bursty output can't saturate the main runloop. See P0 in
+    /// docs/planning/oss-refactor-plan.md.
+    private let coalescer = CaptureCoalescer(maxHz: 20.0)
+    /// The next deferred capture, if any. We hold one work item at a
+    /// time so a burst of dirties collapses into a single capture.
+    private var pendingCapture: DispatchWorkItem?
     private var sshTransport: (any CattySSHTransporting)?
     /// Dirty flag set by the terminal view whenever it marks itself for
     /// redisplay. The capture timer reads + clears this each tick to
@@ -124,6 +132,7 @@ public final class TerminalLiveTextureSource {
     private func wireDirtyTracking() {
         let mark: () -> Void = { [weak self] in
             self?.needsCapture = true
+            self?.requestCapture()
         }
         if let local = terminalView as? DirtyTrackingLocalProcessTerminalView {
             local.onDirty = mark
@@ -148,7 +157,7 @@ public final class TerminalLiveTextureSource {
             // for before/after screenshot parity.
             if DeterministicRender.isOn {
                 view.feed(byteArray: ArraySlice(Array(DeterministicRender.terminalFixture.utf8)))
-                startCaptureLoop()
+                requestCapture()
                 return
             }
             let shell = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
@@ -246,7 +255,11 @@ public final class TerminalLiveTextureSource {
                 initialRows: 30
             )
         }
-        startCaptureLoop()
+        // Prime the texture so the plane isn't blank on first frame.
+        // After this, captures fire only when SwiftTerm signals dirty
+        // (via the `onDirty` -> `requestCapture` wiring above),
+        // rate-capped by the coalescer.
+        requestCapture()
     }
 
     /// Make the terminal the focused first responder of the app's main
@@ -258,18 +271,24 @@ public final class TerminalLiveTextureSource {
 
     // MARK: - Capture loop
 
-    private func startCaptureLoop() {
-        // 30Hz capture. The 3D scene itself runs at the display refresh
-        // rate via TimelineView(.animation) — typically 60Hz on most
-        // Macs. The texture only refreshes on capture ticks; the scene
-        // RE-USES the most recent one between ticks (see the diff guard
-        // in `applyTerminalTexture`), so 30Hz text doesn't gate 60fps
-        // motion.
-        captureTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.captureFrame()
-            }
+    /// Schedule a capture on the main runloop, coalesced + rate-capped
+    /// by `coalescer`. P0 (docs/planning/oss-refactor-plan.md) replaces
+    /// the old fixed 30 Hz Timer with this: idle terminals cost zero,
+    /// bursty output coalesces, and 20 Hz is well under the display
+    /// refresh so the RealityKit tick + SwiftUI body keep their slot.
+    /// Multiple rapid dirty signals collapse into a single eventual
+    /// capture via the `pendingCapture == nil` guard.
+    private func requestCapture() {
+        guard pendingCapture == nil else { return }
+        let delay = coalescer.delay(forNow: CFAbsoluteTimeGetCurrent())
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.pendingCapture = nil
+            self.coalescer.didCapture(at: CFAbsoluteTimeGetCurrent())
+            self.captureFrame()
         }
+        pendingCapture = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
 
     private func captureFrame() {
@@ -326,12 +345,13 @@ public final class TerminalLiveTextureSource {
         #endif
     }
 
-    /// Stop the capture loop and tear down any SSH transport. Call
-    /// before releasing — deinit can't touch `captureTimer` because
-    /// that's main-actor-isolated and deinit isn't.
+    /// Stop the capture pipeline and tear down any SSH transport.
+    /// Call before releasing — deinit can't touch
+    /// `pendingCapture`/`sshTransport` because they're main-actor-
+    /// isolated and deinit isn't.
     public func stop() {
-        captureTimer?.invalidate()
-        captureTimer = nil
+        pendingCapture?.cancel()
+        pendingCapture = nil
         sshTransport?.cattyDisconnect()
         sshTransport = nil
     }
